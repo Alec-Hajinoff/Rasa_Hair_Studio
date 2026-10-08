@@ -19,3 +19,5 @@ Thumbs.db
 
 # VS Code workspace settings
 .vscode/settings.json
+
+PHP/error_log.txt
