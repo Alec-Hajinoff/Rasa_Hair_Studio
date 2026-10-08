@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./MainRegLog.css";
-import Main from "./Main.js";
+import Main from "./Main.jsx";
 import UserRegistration from "./UserRegistration.js";
 import UserLogin from "./UserLogin.js";
 
