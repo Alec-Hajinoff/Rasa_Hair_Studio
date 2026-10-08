@@ -1,0 +1,21 @@
+# Environment variables
+.env
+
+# PHP Composer
+/vendor/
+
+# React dependencies
+/React/node_modules/
+
+# React build output
+/React/dist/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code workspace settings
+.vscode/settings.json
