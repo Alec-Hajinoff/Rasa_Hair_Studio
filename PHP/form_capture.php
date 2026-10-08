@@ -24,7 +24,7 @@ if (empty($mailUsername) || empty($mailPassword)) {
 }
 
 $allowed_origins = [
-    'http://localhost:3000',
+    'http://localhost:5173',
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -118,7 +118,7 @@ try {
 
         $userId = $conn->lastInsertId();
 
-        $verificationLink = 'http://localhost:3000/VerifyEmail?token=' . urlencode($verificationToken);
+        $verificationLink = 'http://localhost:5173/VerifyEmail?token=' . urlencode($verificationToken);
 
         $mail = new PHPMailer(true);
 

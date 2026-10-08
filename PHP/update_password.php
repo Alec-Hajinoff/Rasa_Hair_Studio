@@ -5,7 +5,7 @@ require_once 'session_config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $allowed_origins = [
-    'http://localhost:3000',
+    'http://localhost:5173',
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

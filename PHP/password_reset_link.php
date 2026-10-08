@@ -25,7 +25,7 @@ if (empty($mailUsername) || empty($mailPassword)) {
 }
 
 $allowed_origins = [
-    'http://localhost:3000',
+    'http://localhost:5173',
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -114,7 +114,7 @@ try {
             error_log('password_reset_link.php: Failed to store token in database for user ID: ' . $user['id']);
         }
 
-        $resetLink = 'http://localhost:3000/PasswordReset?token=' . urlencode($resetToken);
+        $resetLink = 'http://localhost:5173/PasswordReset?token=' . urlencode($resetToken);
 
         $mail = new PHPMailer(true);
 

@@ -24,7 +24,7 @@ if (empty($mailUsername) || empty($mailPassword)) {
 }
 
 $allowed_origins = [
-    'http://localhost:3000',
+    'http://localhost:5173',
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
