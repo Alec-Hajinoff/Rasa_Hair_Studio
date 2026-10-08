@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./MainRegLog.css";
-import MainComponent from "./MainComponent.jsx";
-import UserRegistration from "./UserRegistration.js";
-import UserLogin from "./UserLogin.js";
+import MainComponent from "./MainComponent";
 
 function MainRegLog({ isAuthenticated, userRole, isLoading }) {
   const [showTooltip, setShowTooltip] = useState(false);

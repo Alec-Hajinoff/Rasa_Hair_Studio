@@ -1,6 +1,6 @@
 import React from "react";
 import "./RegisteredPage.css";
-import UserLogin from "./UserLogin.js";
+import UserLogin from "./UserLogin";
 
 function RegisteredPage() {
   return (
