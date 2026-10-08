@@ -93,7 +93,7 @@ if (empty($first_name) || empty($surname) || empty($phone)) {
 }
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=loveday_auto', 'root', '', [
+    $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,

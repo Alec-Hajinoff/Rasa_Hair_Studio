@@ -27,7 +27,7 @@ if (empty($mailUsername) || empty($mailPassword)) {
 $servername     = '127.0.0.1';
 $username       = 'root';
 $passwordServer = '';
-$dbname         = 'loveday_auto';
+$dbname         = 'rasa_hair_studio';
 
 try {
 
