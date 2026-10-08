@@ -5,9 +5,9 @@ import BookingCallToAction from "./BookingCallToAction";
 import WhyChooseUs from "./WhyChooseUs";
 import TestimonialCarousel from "./TestimonialCarousel";
 
-import "./Main.css";
+import "./MainComponent.css";
 
-function Main({ isAuthenticated, userRole, isLoading }) {
+function MainComponent({ isAuthenticated, userRole, isLoading }) {
   return (
     <div className="overflow-hidden">
       <div>
@@ -47,4 +47,4 @@ function Main({ isAuthenticated, userRole, isLoading }) {
   );
 }
 
-export default Main;
+export default MainComponent;

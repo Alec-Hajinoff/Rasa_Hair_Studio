@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./MainRegLog.css";
-import Main from "./Main.jsx";
+import MainComponent from "./MainComponent.jsx";
 import UserRegistration from "./UserRegistration.js";
 import UserLogin from "./UserLogin.js";
 
@@ -30,7 +30,7 @@ function MainRegLog({ isAuthenticated, userRole, isLoading }) {
   }, []);
 
   return (
-    <Main
+    <MainComponent
       isAuthenticated={isAuthenticated}
       userRole={userRole}
       isLoading={isLoading}
