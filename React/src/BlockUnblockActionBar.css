@@ -1,0 +1,59 @@
+.block-unblock-action-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fff3cd;
+  border: 1px solid #ffe69c;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+}
+
+.block-unblock-bar-text {
+  font-size: 0.825rem;
+  color: #664d03;
+  margin: 0;
+}
+
+.block-unblock-btn-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.block-unblock-btn-primary {
+  background-color: #dc3545;
+  color: #ffffff;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.block-unblock-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.block-unblock-btn-secondary {
+  background-color: #6c757d;
+  color: #ffffff;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.block-unblock-btn-secondary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

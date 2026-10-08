@@ -1,0 +1,99 @@
+.why-choose-section {
+  padding: 3rem 0;
+}
+
+.why-choose-container,
+.contact-us-container {
+  max-width: 800px;
+  margin: 0 auto;
+  height: 100%;
+}
+
+.why-choose-card,
+.contact-us-card {
+  background-color: var(--color-surface-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 2.5rem;
+  border: 1px solid var(--color-border);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.why-choose-heading {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-main);
+  margin-bottom: 1.5rem;
+}
+
+.why-choose-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.why-choose-item {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-md);
+  color: var(--color-text-main);
+  gap: 0.75rem;
+}
+
+.why-choose-check-icon {
+  color: var(--color-success);
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.contact-us-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.contact-us-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.contact-us-icon {
+  color: var(--color-complementary);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.contact-us-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-us-label {
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.15rem;
+}
+
+.contact-us-value {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-text-main);
+  text-decoration: none;
+}
+
+.contact-us-value:hover {
+  color: var(--color-complementary);
+}

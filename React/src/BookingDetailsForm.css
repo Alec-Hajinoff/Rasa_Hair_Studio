@@ -1,0 +1,23 @@
+.booking-details-form {
+  margin-top: 1rem;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.booking-form-group {
+  margin-bottom: 0.75rem;
+}
+
+.booking-message-error {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-danger);
+}
+
+.booking-message-success {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-success);
+}

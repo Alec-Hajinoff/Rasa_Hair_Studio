@@ -1,0 +1,16 @@
+.service-manager-container {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.system-font-label {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-text-main);
+}
+
+.success-message-system {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-success);
+}

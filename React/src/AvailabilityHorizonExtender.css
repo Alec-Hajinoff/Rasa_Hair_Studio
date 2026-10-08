@@ -1,0 +1,12 @@
+.availability-message {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+}
+
+.availability-message.success {
+  color: var(--color-success);
+}
+
+.availability-message.danger {
+  color: var(--color-danger);
+}
