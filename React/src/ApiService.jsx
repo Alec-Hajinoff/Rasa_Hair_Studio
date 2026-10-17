@@ -282,30 +282,6 @@ export const customerDeleteAccount = async () => {
   }
 };
 
-// adminCancelBooking() allows admins to cancel an appointment and notifies the customer via email
-
-export const adminCancelBooking = async (appointmentId) => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_cancel_booking.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ appointment_id: appointmentId }),
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error cancelling booking as admin:", error);
-    throw new Error("An error occurred while cancelling the booking.");
-  }
-};
-
 // adminBookingCalendar() retrieves availability slots for the admin calendar view
 
 export const adminBookingCalendar = async (startDate, endDate) => {
