@@ -14,21 +14,10 @@ import Services from "./Services";
 
 import AboutUs from "./AboutUs";
 
-import React from "react";
-
-export default function AppRoutes({ isAuthenticated, userRole, isLoading }) {
+export default function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <MainRegLog
-            isAuthenticated={isAuthenticated}
-            userRole={userRole}
-            isLoading={isLoading}
-          />
-        }
-      />
+      <Route path="/" element={<MainRegLog />} />
 
       <Route path="/Services" element={<Services />} />
 
