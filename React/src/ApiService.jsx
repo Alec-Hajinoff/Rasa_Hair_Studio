@@ -282,33 +282,6 @@ export const customerDeleteAccount = async () => {
   }
 };
 
-// blockUnblockActionBar() allows admins to block and unblock booking slos
-
-export const blockUnblockActionBar = async (slotIds, action = null) => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/block_unblock_action_bar.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          slot_ids: slotIds,
-          action: action,
-        }),
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error toggling slot statuses:", error);
-    throw new Error("An error occurred while updating availability slots.");
-  }
-};
-
 // availabilityHorizonExtender() generates 3 additional months of availability slots
 
 export const availabilityHorizonExtender = async () => {
