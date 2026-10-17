@@ -215,29 +215,6 @@ export const serviceManager = async (servicesData) => {
   }
 };
 
-/* customerBookingsList() fetches from the database and displays all customer bookings */
-
-export const customerBookingsList = async () => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/customer_bookings_list.php`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching customer bookings list:", error);
-    throw new Error("An error occurred while fetching your bookings.");
-  }
-};
-
 // customerCancelBooking() cancels an appointment and releases its slot
 
 export const customerCancelBooking = async (appointmentId) => {
