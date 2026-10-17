@@ -3,7 +3,6 @@ import "./AdminDashboard.css";
 
 import ServiceManager from "./ServiceManager";
 
-import AdminBookingsList from "./AdminBookingsList";
 import AdminBookingCalendar from "./AdminBookingCalendar";
 import AvailabilityHorizonExtender from "./AvailabilityHorizonExtender";
 
@@ -50,7 +49,6 @@ function AdminDashboard() {
 
           {activeTab === "bookings" && (
             <div className="tab-pane-content">
-              <AdminBookingsList />
               <AdminBookingCalendar />
             </div>
           )}

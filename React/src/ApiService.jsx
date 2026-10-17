@@ -282,29 +282,6 @@ export const customerDeleteAccount = async () => {
   }
 };
 
-// adminBookingsList() fetchs all garage bookings for Admin role
-
-export const adminBookingsList = async () => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_bookings_list.php`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching admin bookings list:", error);
-    throw new Error("An error occurred while fetching garage bookings.");
-  }
-};
-
 // adminCancelBooking() allows admins to cancel an appointment and notifies the customer via email
 
 export const adminCancelBooking = async (appointmentId) => {
