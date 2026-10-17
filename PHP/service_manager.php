@@ -44,6 +44,7 @@ if (! isset($input['services']) || ! is_array($input['services']) || empty($inpu
 }
 
 try {
+
     $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -52,24 +53,38 @@ try {
 
     $pdo->beginTransaction();
 
-    $sql = 'INSERT INTO services (name, duration_minutes, created_at, updated_at)
-            VALUES (:name, :duration_minutes, NOW(), NOW())';
+    $sql = 'INSERT INTO services (title, description, price_type, price, created_at, updated_at)
+            VALUES (:title, :description, :price_type, :price, NOW(), NOW())';
 
     $stmt = $pdo->prepare($sql);
 
     foreach ($input['services'] as $service) {
-        $name     = trim($service['name'] ?? '');
-        $duration = (int) ($service['duration_minutes'] ?? 0);
+        $title       = trim($service['title'] ?? '');
+        $description = trim($service['description'] ?? '');
+        $price_type  = trim($service['price_type'] ?? '');
 
-        if (empty($name) || $duration <= 0) {
+        $price = null;
+        if ($price_type === 'fixed' || $price_type === 'from') {
+            $price = isset($service['price']) && $service['price'] !== '' ? (float) $service['price'] : null;
+        }
+
+        if (empty($title) || empty($description) || ! in_array($price_type, ['fixed', 'from', 'consultation'])) {
             $pdo->rollBack();
-            echo json_encode(['status' => 'error', 'message' => 'Each service requires a valid name and duration in minutes.']);
+            echo json_encode(['status' => 'error', 'message' => 'Each service requires a valid title, description, and price type.']);
+            exit;
+        }
+
+        if (($price_type === 'fixed' || $price_type === 'from') && ($price === null || $price < 0)) {
+            $pdo->rollBack();
+            echo json_encode(['status' => 'error', 'message' => 'A valid price is required for fixed or from price types.']);
             exit;
         }
 
         $stmt->execute([
-            ':name'             => $name,
-            ':duration_minutes' => $duration,
+            ':title'       => $title,
+            ':description' => $description,
+            ':price_type'  => $price_type,
+            ':price'       => $price,
         ]);
     }
 
@@ -81,7 +96,8 @@ try {
         $pdo->rollBack();
     }
     file_put_contents('error_log.txt', $e->getMessage() . PHP_EOL, FILE_APPEND);
-    echo json_encode(['status' => 'error', 'message' => 'Failed to save garage services.']);
+
+    echo json_encode(['status' => 'error', 'message' => 'Failed to save salon services.']);
 } finally {
     $pdo = null;
 }
