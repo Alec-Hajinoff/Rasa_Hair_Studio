@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./UserDashboard.css";
 
-import BookingCalendar from "./BookingCalendar";
 import CustomerBookingsList from "./CustomerBookingsList";
 import CustomerProfile from "./CustomerProfile";
 import CustomerDeleteAccount from "./CustomerDeleteAccount";
@@ -46,14 +45,6 @@ function UserDashboard() {
               </button>
             </li>
           </ul>
-
-          {activeTab === "book-service" && (
-            <div className="tab-pane-content">
-              <BookingCalendar
-                onBookingComplete={() => setActiveTab("my-bookings")}
-              />
-            </div>
-          )}
 
           {activeTab === "my-bookings" && (
             <div className="tab-pane-content">

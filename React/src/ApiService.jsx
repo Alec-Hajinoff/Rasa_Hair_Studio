@@ -191,50 +191,6 @@ export const checkSession = async () => {
   }
 };
 
-// bookingCalendar() retrieves from the database availability slots for a given date range.
-
-export const bookingCalendar = async (startDate, endDate) => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/booking_calendar.php?start_date=${startDate}&end_date=${endDate}`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching booking calendar:", error);
-    throw new Error("An error occurred while loading the calendar.");
-  }
-};
-
-// Sends a selected appointment slot to the database
-
-export const selectedAppointmentSlot = async (bookingData) => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/selected_appointment_slot.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(bookingData),
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error booking appointment slot:", error);
-    throw new Error("An error occurred while confirming your booking.");
-  }
-};
-
 // serviceManager() sends garage services data to the backend
 
 export const serviceManager = async (servicesData) => {
