@@ -1,6 +1,6 @@
 import React from "react";
 import ServicesPriceList from "./ServicesPriceList";
-import BookingCallToAction from "./BookingCallToAction";
+
 import "./Services.css";
 
 function Services({ isAuthenticated, userRole, isLoading }) {
@@ -24,11 +24,6 @@ function Services({ isAuthenticated, userRole, isLoading }) {
         <div className="row justify-content-center">
           <div className="col-12 col-md-11 col-lg-10 mx-auto">
             <ServicesPriceList />
-            <BookingCallToAction
-              isAuthenticated={isAuthenticated}
-              userRole={userRole}
-              isLoading={isLoading}
-            />
           </div>
         </div>
       </div>

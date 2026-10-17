@@ -1,6 +1,6 @@
 import React from "react";
 import AboutUsStory from "./AboutUsStory";
-import BookingCallToAction from "./BookingCallToAction";
+
 import "./AboutUs.css";
 
 function AboutUs({ isAuthenticated, userRole, isLoading }) {
@@ -23,11 +23,6 @@ function AboutUs({ isAuthenticated, userRole, isLoading }) {
         <div className="row justify-content-center">
           <div className="col-12 col-md-11 col-lg-10 mx-auto">
             <AboutUsStory />
-            <BookingCallToAction
-              isAuthenticated={isAuthenticated}
-              userRole={userRole}
-              isLoading={isLoading}
-            />
           </div>
         </div>
       </div>
