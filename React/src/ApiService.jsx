@@ -282,26 +282,6 @@ export const customerDeleteAccount = async () => {
   }
 };
 
-// adminBookingCalendar() retrieves availability slots for the admin calendar view
-
-export const adminBookingCalendar = async (startDate, endDate) => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_booking_calendar.php?start_date=${startDate}&end_date=${endDate}`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching admin booking calendar:", error);
-    throw new Error("An error occurred while loading the admin calendar.");
-  }
-};
-
 // blockUnblockActionBar() allows admins to block and unblock booking slos
 
 export const blockUnblockActionBar = async (slotIds, action = null) => {
