@@ -63,7 +63,6 @@ function AdminDashboard() {
 
           {activeTab === "availability" && (
             <div className="tab-pane-content">
-              <BusinessHoursManager />
               <div className="mt-4">
                 <AvailabilityHorizonExtender />
               </div>

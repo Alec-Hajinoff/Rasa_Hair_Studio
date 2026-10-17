@@ -191,30 +191,6 @@ export const checkSession = async () => {
   }
 };
 
-// businessHoursManager() sends selected business opening hours to the backend.
-
-export const businessHoursManager = async (businessHoursData) => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/business_hours_manager.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ business_hours: businessHoursData }),
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error saving business hours:", error);
-    throw new Error("An error occurred while saving business hours.");
-  }
-};
-
 // bookingCalendar() retrieves from the database availability slots for a given date range.
 
 export const bookingCalendar = async (startDate, endDate) => {
