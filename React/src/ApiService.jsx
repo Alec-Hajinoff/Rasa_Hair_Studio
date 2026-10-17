@@ -281,26 +281,3 @@ export const customerDeleteAccount = async () => {
     throw new Error("An error occurred while deleting your account.");
   }
 };
-
-// availabilityHorizonExtender() generates 3 additional months of availability slots
-
-export const availabilityHorizonExtender = async () => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/availability_horizon_extender.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error extending availability horizon:", error);
-    throw new Error("An error occurred while extending availability slots.");
-  }
-};

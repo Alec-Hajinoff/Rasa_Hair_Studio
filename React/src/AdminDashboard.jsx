@@ -3,8 +3,6 @@ import "./AdminDashboard.css";
 
 import ServiceManager from "./ServiceManager";
 
-import AvailabilityHorizonExtender from "./AvailabilityHorizonExtender";
-
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("bookings");
 
@@ -49,14 +47,6 @@ function AdminDashboard() {
           {activeTab === "products" && (
             <div className="tab-pane-content">
               <ServiceManager />
-            </div>
-          )}
-
-          {activeTab === "availability" && (
-            <div className="tab-pane-content">
-              <div className="mt-4">
-                <AvailabilityHorizonExtender />
-              </div>
             </div>
           )}
         </div>
