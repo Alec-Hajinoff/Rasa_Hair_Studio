@@ -215,30 +215,6 @@ export const serviceManager = async (servicesData) => {
   }
 };
 
-// customerCancelBooking() cancels an appointment and releases its slot
-
-export const customerCancelBooking = async (appointmentId) => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/customer_cancel_booking.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ appointment_id: appointmentId }),
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error cancelling booking:", error);
-    throw new Error("An error occurred while cancelling your booking.");
-  }
-};
-
 // customerProfileGet() retrieves profile details of a customer (first_name, surname, phone)
 
 export const customerProfileGet = async () => {
