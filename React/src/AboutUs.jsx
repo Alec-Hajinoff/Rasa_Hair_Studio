@@ -3,7 +3,7 @@ import AboutUsStory from "./AboutUsStory";
 
 import "./AboutUs.css";
 
-function AboutUs({ isAuthenticated, userRole, isLoading }) {
+function AboutUs() {
   return (
     <div className="about-us-page">
       <section className="about-us-hero-wrapper">
