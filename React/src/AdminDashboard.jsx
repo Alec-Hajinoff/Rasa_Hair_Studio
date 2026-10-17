@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./AdminDashboard.css";
-import BusinessHoursManager from "./BusinessHoursManager";
+
 import ServiceManager from "./ServiceManager";
 
 import AdminBookingsList from "./AdminBookingsList";
