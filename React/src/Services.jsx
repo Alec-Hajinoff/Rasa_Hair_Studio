@@ -3,7 +3,7 @@ import ServicesPriceList from "./ServicesPriceList";
 
 import "./Services.css";
 
-function Services({ isAuthenticated, userRole, isLoading }) {
+function Services() {
   return (
     <div className="services-page">
       <section className="services-hero-wrapper">
