@@ -215,26 +215,6 @@ export const serviceManager = async (servicesData) => {
   }
 };
 
-// bookingDetailsForm() fetches the available garage services list for the booking form
-
-export const bookingDetailsForm = async () => {
-  try {
-    const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/booking_details_form.php`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
-    );
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching services list:", error);
-    throw new Error("An error occurred while fetching services.");
-  }
-};
-
 /* customerBookingsList() fetches from the database and displays all customer bookings */
 
 export const customerBookingsList = async () => {
