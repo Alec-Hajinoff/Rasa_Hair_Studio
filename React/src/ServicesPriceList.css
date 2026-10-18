@@ -54,6 +54,20 @@
   color: var(--color-primary-shade);
 }
 
+.service-status-msg {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.service-status-error {
+  color: var(--color-danger);
+}
+
 @media (max-width: 767.98px) {
   .services-price-card {
     margin: 1rem 0.5rem;

@@ -325,3 +325,22 @@ export const adminServicesListPost = async (serviceData) => {
     throw new Error("An error occurred while updating the service.");
   }
 };
+
+// servicesPriceList() fetches active services for the public price list.
+
+export const servicesPriceList = async () => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/services_price_list.php`,
+      {
+        method: "GET",
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching services price list:", error);
+    throw new Error("An error occurred while loading services.");
+  }
+};
