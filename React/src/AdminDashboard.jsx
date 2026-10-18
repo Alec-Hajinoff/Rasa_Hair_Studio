@@ -3,6 +3,8 @@ import "./AdminDashboard.css";
 import ServiceManager from "./ServiceManager";
 import AdminServicesList from "./AdminServicesList";
 
+import AdminGalleryImages from "./AdminGalleryImages";
+
 const NAV_ITEMS = [
   { key: "services", label: "Services" },
   { key: "images", label: "Images" },
@@ -31,7 +33,11 @@ function AdminDashboard() {
           </div>
         );
       case "images":
-        return <div>Images placeholder</div>;
+        return (
+          <div className="tab-pane-content">
+            <AdminGalleryImages />
+          </div>
+        );
       case "profile":
         return <div>Stylist Profile placeholder</div>;
       case "blog":

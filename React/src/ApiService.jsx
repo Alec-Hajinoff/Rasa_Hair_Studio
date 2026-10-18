@@ -344,3 +344,25 @@ export const servicesPriceList = async () => {
     throw new Error("An error occurred while loading services.");
   }
 };
+
+// adminGalleryImages() uploads multiple gallery images to the backend.
+
+export const adminGalleryImages = async (formData) => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_gallery_images.php`,
+      {
+        method: "POST",
+
+        credentials: "include",
+        body: formData,
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error uploading gallery images:", error);
+    throw new Error("An error occurred while uploading images.");
+  }
+};
