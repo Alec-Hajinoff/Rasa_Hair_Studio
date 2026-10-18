@@ -366,3 +366,47 @@ export const adminGalleryImages = async (formData) => {
     throw new Error("An error occurred while uploading images.");
   }
 };
+
+// adminGalleryImagesManagerGet() fetches all gallery images for the admin manager.
+
+export const adminGalleryImagesManagerGet = async () => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_gallery_images_manager_get.php`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching gallery images:", error);
+    throw new Error("An error occurred while loading gallery images.");
+  }
+};
+
+// adminGalleryImagesManagerPost() updates a single image's details (title, is_active).
+
+export const adminGalleryImagesManagerPost = async (imageData) => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_gallery_images_manager_post.php`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(imageData),
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating gallery image:", error);
+    throw new Error("An error occurred while updating the image.");
+  }
+};

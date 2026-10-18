@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import "./AdminGalleryImages.css";
 import { adminGalleryImages } from "./ApiService";
 
-function AdminGalleryImages() {
+function AdminGalleryImages({ onUploadSuccess }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -11,7 +11,6 @@ function AdminGalleryImages() {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-
     setSelectedFiles((prev) => [...prev, ...files]);
 
     if (fileInputRef.current) {
@@ -42,10 +41,13 @@ function AdminGalleryImages() {
       if (response.status === "success") {
         setFeedback({ type: "success", message: response.message });
         setSelectedFiles([]);
+
+        if (onUploadSuccess) onUploadSuccess();
       } else if (response.status === "partial") {
         setFeedback({ type: "warning", message: response.message });
-
         setSelectedFiles([]);
+
+        if (onUploadSuccess) onUploadSuccess();
       } else {
         setFeedback({ type: "danger", message: response.message });
       }

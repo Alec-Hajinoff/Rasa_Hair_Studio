@@ -5,6 +5,8 @@ import AdminServicesList from "./AdminServicesList";
 
 import AdminGalleryImages from "./AdminGalleryImages";
 
+import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
+
 const NAV_ITEMS = [
   { key: "services", label: "Services" },
   { key: "images", label: "Images" },
@@ -16,6 +18,9 @@ const NAV_ITEMS = [
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("services");
   const [servicesRefreshKey, setServicesRefreshKey] = useState(0);
+
+  const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
+
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
 
   const activeLabel =
@@ -35,7 +40,13 @@ function AdminDashboard() {
       case "images":
         return (
           <div className="tab-pane-content">
-            <AdminGalleryImages />
+            <AdminGalleryImages
+              onUploadSuccess={() => setGalleryRefreshKey((k) => k + 1)}
+            />
+            <AdminGalleryImagesManager
+              key={galleryRefreshKey}
+              refreshKey={galleryRefreshKey}
+            />
           </div>
         );
       case "profile":
