@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./ServiceManager.css";
 import { serviceManager } from "./ApiService";
 
-function ServiceManager() {
+function ServiceManager({ onSaved }) {
   const [services, setServices] = useState([
     { title: "", description: "", price_type: "fixed", price: "" },
   ]);
@@ -80,6 +80,8 @@ function ServiceManager() {
         setServices([
           { title: "", description: "", price_type: "fixed", price: "" },
         ]);
+
+        onSaved?.();
       } else {
         setMessage(response.message || "Failed to save services.");
       }
@@ -102,7 +104,6 @@ function ServiceManager() {
                 key={index}
                 className="row g-3 align-items-start mb-3 pb-3 border-bottom"
               >
-                {/* Service Title Input */}
                 <div className="col-12 col-md-6">
                   <label className="form-label system-font-label">
                     Service #{index + 1} Title{" "}

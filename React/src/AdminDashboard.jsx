@@ -7,6 +7,8 @@ import AdminServicesList from "./AdminServicesList";
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("bookings");
 
+  const [servicesRefreshKey, setServicesRefreshKey] = useState(0);
+
   return (
     <div className="admin-container container">
       <div className="row justify-content-center">
@@ -47,8 +49,11 @@ function AdminDashboard() {
 
           {activeTab === "products" && (
             <div className="tab-pane-content">
-              <ServiceManager />
-              <AdminServicesList />
+              <ServiceManager
+                onSaved={() => setServicesRefreshKey((k) => k + 1)}
+              />
+
+              <AdminServicesList key={servicesRefreshKey} />
             </div>
           )}
         </div>
