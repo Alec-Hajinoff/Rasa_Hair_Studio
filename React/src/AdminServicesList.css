@@ -1,0 +1,222 @@
+.admin-services-container {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-services-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.admin-services-title {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+.admin-services-message {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  margin: 0;
+}
+
+.admin-services-message.success {
+  color: var(--color-success);
+}
+
+.admin-services-message.error {
+  color: var(--color-danger);
+}
+
+.admin-service-card {
+  background-color: var(--color-text-inverse);
+  border: 1px solid #e3e6f0;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.admin-service-card.inactive {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.admin-service-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-service-card-title {
+  font-family: var(--font-family-base);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+.admin-service-card-subtitle {
+  font-family: var(--font-family-base);
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.2rem;
+}
+
+.admin-service-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-service-badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-service-badge.active {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.admin-service-badge.inactive {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.admin-service-badge.type {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.admin-service-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.9rem;
+}
+
+.admin-service-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-service-field-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.admin-service-field-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.3rem;
+}
+
+.admin-service-field-group input,
+.admin-service-field-group textarea,
+.admin-service-field-group select {
+  padding: 0.45rem 0.65rem;
+  font-size: 0.9rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.admin-service-field-group input:disabled,
+.admin-service-field-group textarea:disabled,
+.admin-service-field-group select:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+.admin-service-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.btn-service-edit,
+.btn-service-save {
+  background-color: #0d6efd;
+  color: #ffffff;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-service-edit:hover,
+.btn-service-save:hover {
+  background-color: #0b5ed7;
+}
+
+.btn-service-edit:disabled,
+.btn-service-save:disabled {
+  background-color: #86b7fe;
+  cursor: not-allowed;
+}
+
+.btn-service-cancel {
+  background-color: #6c757d;
+  color: #ffffff;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-service-cancel:hover {
+  background-color: #5c636a;
+}
+
+.btn-service-toggle {
+  background-color: #fff;
+  color: #0d6efd;
+  border: 1px solid #0d6efd;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-service-toggle:hover {
+  background-color: #e7f1ff;
+}
+
+.btn-service-toggle.reactivate {
+  color: #198754;
+  border-color: #198754;
+}
+
+.btn-service-toggle.reactivate:hover {
+  background-color: #e6f4ec;
+}
+
+.admin-services-empty {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: #6c757d;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.admin-services-loading {
+  font-family: var(--font-family-base);
+  color: #6c757d;
+  padding: 1rem 0;
+}

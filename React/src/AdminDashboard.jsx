@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./AdminDashboard.css";
 
 import ServiceManager from "./ServiceManager";
+import AdminServicesList from "./AdminServicesList";
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("bookings");
@@ -47,6 +48,7 @@ function AdminDashboard() {
           {activeTab === "products" && (
             <div className="tab-pane-content">
               <ServiceManager />
+              <AdminServicesList />
             </div>
           )}
         </div>

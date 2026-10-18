@@ -281,3 +281,47 @@ export const customerDeleteAccount = async () => {
     throw new Error("An error occurred while deleting your account.");
   }
 };
+
+// adminServicesListGet() retrieves all services for the admin dashboard.
+
+export const adminServicesListGet = async () => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_services_list_get.php`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching services list:", error);
+    throw new Error("An error occurred while loading services.");
+  }
+};
+
+// adminServicesListPost() updates an existing services.
+
+export const adminServicesListPost = async (serviceData) => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_services_list_post.php`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(serviceData),
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating service:", error);
+    throw new Error("An error occurred while updating the service.");
+  }
+};
