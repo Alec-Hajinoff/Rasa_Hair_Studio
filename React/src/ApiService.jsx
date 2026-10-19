@@ -410,3 +410,22 @@ export const adminGalleryImagesManagerPost = async (imageData) => {
     throw new Error("An error occurred while updating the image.");
   }
 };
+
+// galleryImages() fetches all active gallery images for the public gallery page.
+
+export const galleryImages = async () => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/gallery_images.php`,
+      {
+        method: "GET",
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching gallery images:", error);
+    throw new Error("An error occurred while loading gallery images.");
+  }
+};
