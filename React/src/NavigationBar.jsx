@@ -43,6 +43,15 @@ function NavigationBar({ isAuthenticated, userRole }) {
               </Link>
 
               <Link
+                to="/Gallery"
+                className={`nav-bar-link ${
+                  location.pathname.toLowerCase() === "/gallery" ? "active" : ""
+                }`}
+              >
+                Gallery
+              </Link>
+
+              <Link
                 to="/AboutUs"
                 className={`nav-bar-link ${
                   location.pathname.toLowerCase() === "/aboutus" ? "active" : ""

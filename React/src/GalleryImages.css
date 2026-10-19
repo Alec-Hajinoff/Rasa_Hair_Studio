@@ -1,0 +1,12 @@
+.gallery-images-wrapper {
+  padding: 1.5rem 0;
+}
+
+.gallery-title {
+  color: var(--color-primary, #0b62f5);
+  margin-bottom: 1rem;
+}
+
+.gallery-placeholder {
+  color: var(--color-text, #333333);
+}

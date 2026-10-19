@@ -11,7 +11,7 @@ import UserLogin from "./UserLogin";
 import UserRegistration from "./UserRegistration";
 
 import Services from "./Services";
-
+import GalleryImages from "./GalleryImages";
 import AboutUs from "./AboutUs";
 
 export default function AppRoutes() {
@@ -20,6 +20,8 @@ export default function AppRoutes() {
       <Route path="/" element={<MainRegLog />} />
 
       <Route path="/Services" element={<Services />} />
+
+      <Route path="/Gallery" element={<GalleryImages />} />
 
       <Route path="/AboutUs" element={<AboutUs />} />
 
