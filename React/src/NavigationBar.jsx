@@ -64,7 +64,7 @@ function NavigationBar({ isAuthenticated, userRole }) {
                 to={targetDashboardPath}
                 className={`nav-bar-link ${isDashboardActive ? "active" : ""}`}
               >
-                Dashboard
+                My Account
               </Link>
             </nav>
           </div>
