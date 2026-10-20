@@ -14,10 +14,12 @@ const validateFile = (file, allowedExts, allowedTypes, label) => {
   if (file.size > MAX_FILE_SIZE) {
     return `${label} exceeds the 2MB maximum file size.`;
   }
+
   const ext = getExt(file.name);
   if (!allowedExts.includes(ext) || !allowedTypes.includes(file.type)) {
     return `${label} is not an allowed file type.`;
   }
+
   return null;
 };
 
@@ -26,13 +28,12 @@ const initialFormState = () => ({
   biography: "",
   experience: "",
   qualifications: "",
-
   profileImage: null,
   certificates: [],
   errors: {},
 });
 
-function AdminStylistProfile() {
+function AdminStylistProfile({ onCreated }) {
   const [form, setForm] = useState(initialFormState());
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -54,11 +55,13 @@ function AdminStylistProfile() {
   const onProfileImageChange = (e) => {
     const file = e.target.files?.[0] || null;
     setFeedback(null);
+
     if (!file) {
       update({ profileImage: null });
       updateError("profileImage", undefined);
       return;
     }
+
     const err = validateFile(file, IMAGE_EXTS, IMAGE_TYPES, file.name);
     if (err) {
       e.target.value = "";
@@ -66,6 +69,7 @@ function AdminStylistProfile() {
       updateError("profileImage", err);
       return;
     }
+
     update({ profileImage: file });
     updateError("profileImage", undefined);
   };
@@ -73,10 +77,12 @@ function AdminStylistProfile() {
   const onCertificatesChange = (e) => {
     const picked = Array.from(e.target.files || []);
     e.target.value = "";
+
     if (!picked.length) return;
 
     const errors = [];
     const valid = [];
+
     picked.forEach((file) => {
       const err = validateFile(file, CERT_EXTS, CERT_TYPES, file.name);
       if (err) errors.push(err);
@@ -102,9 +108,12 @@ function AdminStylistProfile() {
 
   const validate = () => {
     const errs = {};
-    if (!form.name.trim()) errs.name = "Stylist name is required.";
-    else if (form.name.trim().length > 255)
+
+    if (!form.name.trim()) {
+      errs.name = "Stylist name is required.";
+    } else if (form.name.trim().length > 255) {
       errs.name = "Stylist name exceeds 255 characters.";
+    }
 
     if (form.profileImage) {
       const err = validateFile(
@@ -123,6 +132,7 @@ function AdminStylistProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback(null);
+
     if (!validate()) return;
 
     const formData = new FormData();
@@ -131,22 +141,31 @@ function AdminStylistProfile() {
     formData.append("experience", form.experience);
     formData.append("qualifications", form.qualifications);
 
-    if (form.profileImage) formData.append("profile_image", form.profileImage);
-    form.certificates.forEach((file) =>
-      formData.append("certificates[]", file),
-    );
+    if (form.profileImage) {
+      formData.append("profile_image", form.profileImage);
+    }
+
+    form.certificates.forEach((file) => {
+      formData.append("certificates[]", file);
+    });
 
     setSubmitting(true);
+
     try {
       const data = await adminStylistProfile(formData);
+
       if (data.status === "success") {
         setFeedback({ type: "success", text: data.message });
+        onCreated?.();
         setForm(initialFormState());
 
-        if (profileImageInputRef.current)
+        if (profileImageInputRef.current) {
           profileImageInputRef.current.value = "";
-        if (certificatesInputRef.current)
+        }
+
+        if (certificatesInputRef.current) {
           certificatesInputRef.current.value = "";
+        }
       } else if (data.status === "partial") {
         setFeedback({ type: "partial", text: data.message });
       } else {
@@ -178,6 +197,7 @@ function AdminStylistProfile() {
   return (
     <div className="stylist-profile-admin">
       <h4 className="mb-3">Add Stylist Profile</h4>
+
       <p className="text-muted">
         Submit one stylist at a time. The form resets after a successful save so
         you can add the next stylist.
@@ -189,6 +209,7 @@ function AdminStylistProfile() {
             <label htmlFor="sp-name" className="form-label">
               Stylist Name <span className="text-danger">*</span>
             </label>
+
             <input
               id="sp-name"
               type="text"
@@ -198,6 +219,7 @@ function AdminStylistProfile() {
               onChange={(e) => update({ name: e.target.value })}
               required
             />
+
             {form.errors.name && (
               <div className="invalid-feedback">{form.errors.name}</div>
             )}
@@ -207,15 +229,20 @@ function AdminStylistProfile() {
             <label htmlFor="sp-image" className="form-label">
               Profile Image
             </label>
+
             <input
               id="sp-image"
               ref={profileImageInputRef}
               type="file"
               accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-              className={`form-control ${form.errors.profileImage ? "is-invalid" : ""}`}
+              className={`form-control ${
+                form.errors.profileImage ? "is-invalid" : ""
+              }`}
               onChange={onProfileImageChange}
             />
+
             <div className="form-text">JPG, JPEG or PNG. Max 2MB.</div>
+
             {form.errors.profileImage && (
               <div className="invalid-feedback d-block">
                 {form.errors.profileImage}
@@ -227,6 +254,7 @@ function AdminStylistProfile() {
             <label htmlFor="sp-bio" className="form-label">
               Biography
             </label>
+
             <textarea
               id="sp-bio"
               className="form-control"
@@ -240,6 +268,7 @@ function AdminStylistProfile() {
             <label htmlFor="sp-exp" className="form-label">
               Experience
             </label>
+
             <textarea
               id="sp-exp"
               className="form-control"
@@ -253,6 +282,7 @@ function AdminStylistProfile() {
             <label htmlFor="sp-qual" className="form-label">
               Qualifications
             </label>
+
             <textarea
               id="sp-qual"
               className="form-control"
@@ -266,18 +296,23 @@ function AdminStylistProfile() {
             <label htmlFor="sp-certs" className="form-label">
               Certificates
             </label>
+
             <input
               id="sp-certs"
               ref={certificatesInputRef}
               type="file"
               multiple
               accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
-              className={`form-control ${form.errors.certificates ? "is-invalid" : ""}`}
+              className={`form-control ${
+                form.errors.certificates ? "is-invalid" : ""
+              }`}
               onChange={onCertificatesChange}
             />
+
             <div className="form-text">
               JPG, JPEG, PNG or PDF. Max 2MB each.
             </div>
+
             {form.errors.certificates && (
               <div className="invalid-feedback d-block">
                 {form.errors.certificates}
@@ -292,6 +327,7 @@ function AdminStylistProfile() {
                     className="list-group-item d-flex justify-content-between align-items-center"
                   >
                     <span className="text-truncate">{f.name}</span>
+
                     <button
                       type="button"
                       className="btn btn-sm btn-outline-danger"

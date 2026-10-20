@@ -21,10 +21,12 @@ const validateFile = (file) => {
   if (file.size > MAX_FILE_SIZE) {
     return `${file.name} exceeds the 2MB maximum file size.`;
   }
+
   const ext = getExt(file.name);
   if (!IMAGE_EXTS.includes(ext) || !IMAGE_TYPES.includes(file.type)) {
     return `${file.name} is not an allowed file type.`;
   }
+
   return null;
 };
 
@@ -43,7 +45,7 @@ const buildFormFromStylist = (stylist) => ({
   errors: {},
 });
 
-function AdminStylistProfileManager() {
+function AdminStylistProfileManager({ refreshKey }) {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [stylists, setStylists] = useState([]);
@@ -57,8 +59,10 @@ function AdminStylistProfileManager() {
   const loadStylists = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
+
     try {
       const data = await adminStylistProfileManagerGet();
+
       if (data.status === "success") {
         setStylists(Array.isArray(data.stylists) ? data.stylists : []);
       } else {
@@ -73,7 +77,7 @@ function AdminStylistProfileManager() {
 
   useEffect(() => {
     loadStylists();
-  }, [loadStylists]);
+  }, [loadStylists, refreshKey]);
 
   const editingStylist = useMemo(
     () => stylists.find((s) => s.id === editingId) || null,
@@ -99,6 +103,7 @@ function AdminStylistProfileManager() {
   const updateCertTitle = (certId, title) => {
     setForm((prev) => {
       if (!prev) return prev;
+
       return {
         ...prev,
         certEdits: {
@@ -112,7 +117,9 @@ function AdminStylistProfileManager() {
   const toggleCertDeletion = (certId) => {
     setForm((prev) => {
       if (!prev) return prev;
+
       const current = prev.certEdits[certId];
+
       return {
         ...prev,
         certEdits: {
@@ -128,6 +135,7 @@ function AdminStylistProfileManager() {
 
   const onProfileImageChange = (e) => {
     const file = e.target.files?.[0] || null;
+
     if (!file) {
       updateField({
         newProfileImage: null,
@@ -135,7 +143,9 @@ function AdminStylistProfileManager() {
       });
       return;
     }
+
     const err = validateFile(file);
+
     if (err) {
       e.target.value = "";
       updateField({
@@ -144,6 +154,7 @@ function AdminStylistProfileManager() {
       });
       return;
     }
+
     updateField({
       newProfileImage: file,
       removeProfileImage: false,
@@ -153,9 +164,12 @@ function AdminStylistProfileManager() {
 
   const validateForm = () => {
     const errs = {};
-    if (!form.name.trim()) errs.name = "Stylist name is required.";
-    else if (form.name.trim().length > 255)
+
+    if (!form.name.trim()) {
+      errs.name = "Stylist name is required.";
+    } else if (form.name.trim().length > 255) {
       errs.name = "Stylist name exceeds 255 characters.";
+    }
 
     if (form.newProfileImage) {
       const err = validateFile(form.newProfileImage);
@@ -164,10 +178,12 @@ function AdminStylistProfileManager() {
 
     Object.entries(form.certEdits).forEach(([cid, c]) => {
       if (c.markedForDeletion) return;
-      if (!c.title.trim())
+
+      if (!c.title.trim()) {
         errs[`cert_${cid}`] = "Certificate title cannot be empty.";
-      else if (c.title.trim().length > 255)
+      } else if (c.title.trim().length > 255) {
         errs[`cert_${cid}`] = "Certificate title exceeds 255 characters.";
+      }
     });
 
     setForm((prev) => ({ ...prev, errors: errs }));
@@ -177,6 +193,7 @@ function AdminStylistProfileManager() {
   const handleSave = async (e) => {
     e.preventDefault();
     setFeedback(null);
+
     if (!validateForm()) return;
 
     const fd = new FormData();
@@ -202,15 +219,20 @@ function AdminStylistProfileManager() {
     });
 
     setSubmitting(true);
+
     try {
       const data = await adminStylistProfileManagerPost(fd);
+
       if (data.status === "success") {
         setFeedback({
           type: "success",
           text: data.message || "Stylist updated.",
         });
-        if (profileImageInputRef.current)
+
+        if (profileImageInputRef.current) {
           profileImageInputRef.current.value = "";
+        }
+
         setEditingId(null);
         setForm(null);
         await loadStylists();
@@ -226,19 +248,25 @@ function AdminStylistProfileManager() {
 
   const renderCertificates = () => {
     if (!editingStylist) return null;
+
     const certs = editingStylist.certificates || [];
+
     if (certs.length === 0) {
       return <p className="text-muted mb-0">No certificates.</p>;
     }
+
     return (
       <ul className="list-group">
         {certs.map((c) => {
           const edit = form.certEdits[c.id];
           const marked = edit?.markedForDeletion;
+
           return (
             <li
               key={c.id}
-              className={`list-group-item d-flex align-items-start gap-2 ${marked ? "cert-marked" : ""}`}
+              className={`list-group-item d-flex align-items-start gap-2 ${
+                marked ? "cert-marked" : ""
+              }`}
             >
               <div className="flex-grow-1">
                 <label
@@ -247,25 +275,33 @@ function AdminStylistProfileManager() {
                 >
                   Title
                 </label>
+
                 <input
                   id={`cert-title-${c.id}`}
                   type="text"
-                  className={`form-control form-control-sm ${form.errors[`cert_${c.id}`] ? "is-invalid" : ""}`}
+                  className={`form-control form-control-sm ${
+                    form.errors[`cert_${c.id}`] ? "is-invalid" : ""
+                  }`}
                   value={edit?.title ?? ""}
                   maxLength={255}
                   disabled={marked}
                   onChange={(e) => updateCertTitle(c.id, e.target.value)}
                 />
+
                 {form.errors[`cert_${c.id}`] && (
                   <div className="invalid-feedback">
                     {form.errors[`cert_${c.id}`]}
                   </div>
                 )}
+
                 <small className="text-muted d-block mt-1">{c.file_path}</small>
               </div>
+
               <button
                 type="button"
-                className={`btn btn-sm ${marked ? "btn-outline-secondary" : "btn-outline-danger"} align-self-center`}
+                className={`btn btn-sm ${
+                  marked ? "btn-outline-secondary" : "btn-outline-danger"
+                } align-self-center`}
                 onClick={() => toggleCertDeletion(c.id)}
               >
                 {marked ? "Undo" : "Mark for deletion"}
@@ -287,6 +323,7 @@ function AdminStylistProfileManager() {
         <div className="alert alert-danger" role="alert">
           {loadError}
         </div>
+
         <button className="btn btn-outline-dark" onClick={loadStylists}>
           Retry
         </button>
@@ -321,6 +358,7 @@ function AdminStylistProfileManager() {
               </th>
             </tr>
           </thead>
+
           <tbody>
             {stylists.length === 0 && (
               <tr>
@@ -329,22 +367,29 @@ function AdminStylistProfileManager() {
                 </td>
               </tr>
             )}
+
             {stylists.map((s) => {
               const active = Number(s.is_active) === 1;
+
               return (
                 <tr
                   key={s.id}
                   className={editingId === s.id ? "table-active" : ""}
                 >
                   <td>{s.name}</td>
+
                   <td>
                     <span
-                      className={`badge ${active ? "bg-success" : "bg-secondary"}`}
+                      className={`badge ${
+                        active ? "bg-success" : "bg-secondary"
+                      }`}
                     >
                       {active ? "Active" : "Inactive"}
                     </span>
                   </td>
+
                   <td>{s.created_at}</td>
+
                   <td className="text-end">
                     {editingId === s.id ? (
                       <button
@@ -372,20 +417,25 @@ function AdminStylistProfileManager() {
       {form && editingStylist && (
         <section className="edit-panel mt-4">
           <h5 className="mb-3">Edit: {editingStylist.name}</h5>
+
           <form onSubmit={handleSave} noValidate>
             <div className="row g-3">
               <div className="col-md-8">
                 <label className="form-label" htmlFor="mgr-name">
                   Name <span className="text-danger">*</span>
                 </label>
+
                 <input
                   id="mgr-name"
                   type="text"
-                  className={`form-control ${form.errors.name ? "is-invalid" : ""}`}
+                  className={`form-control ${
+                    form.errors.name ? "is-invalid" : ""
+                  }`}
                   value={form.name}
                   maxLength={255}
                   onChange={(e) => updateField({ name: e.target.value })}
                 />
+
                 {form.errors.name && (
                   <div className="invalid-feedback">{form.errors.name}</div>
                 )}
@@ -393,6 +443,7 @@ function AdminStylistProfileManager() {
 
               <div className="col-md-4">
                 <label className="form-label d-block">Status</label>
+
                 <div className="form-check">
                   <input
                     className="form-check-input"
@@ -406,6 +457,7 @@ function AdminStylistProfileManager() {
                     Active
                   </label>
                 </div>
+
                 <div className="form-check">
                   <input
                     className="form-check-input"
@@ -423,6 +475,7 @@ function AdminStylistProfileManager() {
 
               <div className="col-12">
                 <label className="form-label">Profile Image</label>
+
                 {editingStylist.profile_image_path &&
                   !form.removeProfileImage &&
                   !form.newProfileImage && (
@@ -432,6 +485,7 @@ function AdminStylistProfileManager() {
                         alt="Current profile"
                         className="profile-thumb"
                       />
+
                       <div className="form-check mt-2">
                         <input
                           className="form-check-input"
@@ -445,6 +499,7 @@ function AdminStylistProfileManager() {
                             })
                           }
                         />
+
                         <label
                           className="form-check-label"
                           htmlFor="mgr-remove-image"
@@ -454,17 +509,22 @@ function AdminStylistProfileManager() {
                       </div>
                     </div>
                   )}
+
                 <input
                   ref={profileImageInputRef}
                   type="file"
                   accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                  className={`form-control ${form.errors.profileImage ? "is-invalid" : ""}`}
+                  className={`form-control ${
+                    form.errors.profileImage ? "is-invalid" : ""
+                  }`}
                   onChange={onProfileImageChange}
                 />
+
                 <div className="form-text">
                   JPG, JPEG or PNG. Max 2MB. Uploading replaces the current
                   image.
                 </div>
+
                 {form.errors.profileImage && (
                   <div className="invalid-feedback d-block">
                     {form.errors.profileImage}
@@ -476,6 +536,7 @@ function AdminStylistProfileManager() {
                 <label className="form-label" htmlFor="mgr-bio">
                   Biography
                 </label>
+
                 <textarea
                   id="mgr-bio"
                   className="form-control"
@@ -489,6 +550,7 @@ function AdminStylistProfileManager() {
                 <label className="form-label" htmlFor="mgr-exp">
                   Experience
                 </label>
+
                 <textarea
                   id="mgr-exp"
                   className="form-control"
@@ -502,6 +564,7 @@ function AdminStylistProfileManager() {
                 <label className="form-label" htmlFor="mgr-qual">
                   Qualifications
                 </label>
+
                 <textarea
                   id="mgr-qual"
                   className="form-control"
@@ -526,6 +589,7 @@ function AdminStylistProfileManager() {
                 >
                   {submitting ? "Saving…" : "Save"}
                 </button>
+
                 <button
                   type="button"
                   className="btn btn-outline-secondary"

@@ -4,7 +4,6 @@ import ServiceManager from "./ServiceManager";
 import AdminServicesList from "./AdminServicesList";
 
 import AdminGalleryImages from "./AdminGalleryImages";
-
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
 import AdminStylistProfile from "./AdminStylistProfile";
@@ -23,6 +22,7 @@ function AdminDashboard() {
   const [servicesRefreshKey, setServicesRefreshKey] = useState(0);
 
   const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
+  const [stylistRefreshKey, setStylistRefreshKey] = useState(0);
 
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
 
@@ -40,6 +40,7 @@ function AdminDashboard() {
             <AdminServicesList key={servicesRefreshKey} />
           </div>
         );
+
       case "images":
         return (
           <div className="tab-pane-content">
@@ -52,17 +53,25 @@ function AdminDashboard() {
             />
           </div>
         );
+
       case "profile":
         return (
           <div className="tab-pane-content">
-            <AdminStylistProfile />
-            <AdminStylistProfileManager />
+            {/* Update: notify the manager after a stylist is successfully created. */}
+            <AdminStylistProfile
+              onCreated={() => setStylistRefreshKey((key) => key + 1)}
+            />
+            {/* Update: pass the shared refresh signal to the manager. */}
+            <AdminStylistProfileManager refreshKey={stylistRefreshKey} />
           </div>
         );
+
       case "blog":
         return <div>Blog placeholder</div>;
+
       case "shop":
         return <div>Shop & Orders placeholder</div>;
+
       default:
         return null;
     }
@@ -81,7 +90,11 @@ function AdminDashboard() {
               <button
                 key={item.key}
                 type="button"
-                className={`nav-link text-start mb-2 ${activeTab === item.key ? "active fw-bold bg-light" : "text-dark"}`}
+                className={`nav-link text-start mb-2 ${
+                  activeTab === item.key
+                    ? "active fw-bold bg-light"
+                    : "text-dark"
+                }`}
                 onClick={() => setActiveTab(item.key)}
               >
                 {item.label}
@@ -128,13 +141,18 @@ function AdminDashboard() {
             onClick={() => setOffcanvasOpen(false)}
           ></button>
         </div>
+
         <div className="offcanvas-body p-0 pt-3">
           <nav className="nav flex-column px-3">
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.key}
                 type="button"
-                className={`nav-link text-start mb-2 ${activeTab === item.key ? "active fw-bold bg-light" : "text-dark"}`}
+                className={`nav-link text-start mb-2 ${
+                  activeTab === item.key
+                    ? "active fw-bold bg-light"
+                    : "text-dark"
+                }`}
                 onClick={() => {
                   setActiveTab(item.key);
                   setOffcanvasOpen(false);
