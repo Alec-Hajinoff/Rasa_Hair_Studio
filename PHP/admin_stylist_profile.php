@@ -119,7 +119,6 @@ $name           = trim((string) ($_POST['name'] ?? ''));
 $biography      = trim((string) ($_POST['biography'] ?? ''));
 $experience     = trim((string) ($_POST['experience'] ?? ''));
 $qualifications = trim((string) ($_POST['qualifications'] ?? ''));
-$isActive       = (isset($_POST['is_active']) && (string) $_POST['is_active'] === '1') ? 1 : 0;
 
 $errors = [];
 
@@ -174,6 +173,7 @@ if (is_array($certInput)) {
     }
 }
 
+$profileImageInvalid = false;
 foreach ($errors as $e) {
     if (strpos($e, 'Profile image') === 0) {
         $profileImageInvalid = true;
@@ -194,7 +194,8 @@ if (! is_dir($certUploadDir)) {
 
 $movedFiles = [];
 $savedCerts = 0;
-$saveErrors = $errors;
+
+$saveErrors = [];
 
 try {
     $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
@@ -219,16 +220,15 @@ try {
     }
 
     $insertStylistSql = 'INSERT INTO stylists
-        (name, profile_image_path, biography, experience, qualifications, is_active, created_at, updated_at)
+        (name, profile_image_path, biography, experience, qualifications, created_at, updated_at)
         VALUES
-        (:name, :profile_image_path, :biography, :experience, :qualifications, :is_active, NOW(), NOW())';
+        (:name, :profile_image_path, :biography, :experience, :qualifications, NOW(), NOW())';
     $pdo->prepare($insertStylistSql)->execute([
         ':name'               => $name,
         ':profile_image_path' => $profileImagePath,
         ':biography'          => $biography,
         ':experience'         => $experience,
         ':qualifications'     => $qualifications,
-        ':is_active'          => $isActive,
     ]);
     $stylistId = (int) $pdo->lastInsertId();
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./AdminStylistProfile.css";
 import { adminStylistProfile } from "./ApiService";
 
@@ -26,7 +26,7 @@ const initialFormState = () => ({
   biography: "",
   experience: "",
   qualifications: "",
-  isActive: true,
+
   profileImage: null,
   certificates: [],
   errors: {},
@@ -36,6 +36,9 @@ function AdminStylistProfile() {
   const [form, setForm] = useState(initialFormState());
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
+
+  const profileImageInputRef = useRef(null);
+  const certificatesInputRef = useRef(null);
 
   const update = (patch) => {
     setForm((prev) => ({ ...prev, ...patch }));
@@ -127,7 +130,7 @@ function AdminStylistProfile() {
     formData.append("biography", form.biography);
     formData.append("experience", form.experience);
     formData.append("qualifications", form.qualifications);
-    formData.append("is_active", form.isActive ? "1" : "0");
+
     if (form.profileImage) formData.append("profile_image", form.profileImage);
     form.certificates.forEach((file) =>
       formData.append("certificates[]", file),
@@ -139,6 +142,11 @@ function AdminStylistProfile() {
       if (data.status === "success") {
         setFeedback({ type: "success", text: data.message });
         setForm(initialFormState());
+
+        if (profileImageInputRef.current)
+          profileImageInputRef.current.value = "";
+        if (certificatesInputRef.current)
+          certificatesInputRef.current.value = "";
       } else if (data.status === "partial") {
         setFeedback({ type: "partial", text: data.message });
       } else {
@@ -151,6 +159,22 @@ function AdminStylistProfile() {
     }
   };
 
+  const renderFeedback = () =>
+    feedback && (
+      <div
+        className={`alert mt-3 mb-0 ${
+          feedback.type === "success"
+            ? "alert-success"
+            : feedback.type === "partial"
+              ? "alert-warning"
+              : "alert-danger"
+        }`}
+        role="alert"
+      >
+        {feedback.text}
+      </div>
+    );
+
   return (
     <div className="stylist-profile-admin">
       <h4 className="mb-3">Add Stylist Profile</h4>
@@ -158,21 +182,6 @@ function AdminStylistProfile() {
         Submit one stylist at a time. The form resets after a successful save so
         you can add the next stylist.
       </p>
-
-      {feedback && (
-        <div
-          className={`alert ${
-            feedback.type === "success"
-              ? "alert-success"
-              : feedback.type === "partial"
-                ? "alert-warning"
-                : "alert-danger"
-          }`}
-          role="alert"
-        >
-          {feedback.text}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="row g-3">
@@ -200,6 +209,7 @@ function AdminStylistProfile() {
             </label>
             <input
               id="sp-image"
+              ref={profileImageInputRef}
               type="file"
               accept=".jpg,.jpeg,.png,image/jpeg,image/png"
               className={`form-control ${form.errors.profileImage ? "is-invalid" : ""}`}
@@ -258,6 +268,7 @@ function AdminStylistProfile() {
             </label>
             <input
               id="sp-certs"
+              ref={certificatesInputRef}
               type="file"
               multiple
               accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
@@ -295,21 +306,6 @@ function AdminStylistProfile() {
           </div>
 
           <div className="col-12">
-            <div className="form-check form-switch">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="sp-active"
-                checked={form.isActive}
-                onChange={(e) => update({ isActive: e.target.checked })}
-              />
-              <label className="form-check-label" htmlFor="sp-active">
-                Profile active
-              </label>
-            </div>
-          </div>
-
-          <div className="col-12">
             <button
               type="submit"
               className="btn btn-dark"
@@ -317,6 +313,8 @@ function AdminStylistProfile() {
             >
               {submitting ? "Saving..." : "Save Stylist"}
             </button>
+
+            {renderFeedback()}
           </div>
         </div>
       </form>
