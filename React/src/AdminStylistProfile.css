@@ -1,0 +1,19 @@
+.stylist-profile-admin {
+  max-width: 900px;
+}
+
+.stylist-profile-admin .form-label {
+  font-weight: 600;
+}
+
+.stylist-profile-admin .list-group-item span {
+  max-width: 70%;
+}
+
+.stylist-profile-admin .alert {
+  border-radius: 0.5rem;
+}
+
+.stylist-profile-admin textarea {
+  resize: vertical;
+}

@@ -7,6 +7,8 @@ import AdminGalleryImages from "./AdminGalleryImages";
 
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
+import AdminStylistProfile from "./AdminStylistProfile";
+
 const NAV_ITEMS = [
   { key: "services", label: "Services" },
   { key: "images", label: "Images" },
@@ -50,7 +52,11 @@ function AdminDashboard() {
           </div>
         );
       case "profile":
-        return <div>Stylist Profile placeholder</div>;
+        return (
+          <div className="tab-pane-content">
+            <AdminStylistProfile />
+          </div>
+        );
       case "blog":
         return <div>Blog placeholder</div>;
       case "shop":

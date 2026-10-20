@@ -429,3 +429,24 @@ export const galleryImages = async () => {
     throw new Error("An error occurred while loading gallery images.");
   }
 };
+
+// adminStylistProfile() inserts a single stylist profile (fields + optional profile image + certificates).
+
+export const adminStylistProfile = async (formData) => {
+  try {
+    const response = await fetch(
+      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_stylist_profile.php`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error saving stylist profile:", error);
+    throw new Error("An error occurred while saving the stylist profile.");
+  }
+};
