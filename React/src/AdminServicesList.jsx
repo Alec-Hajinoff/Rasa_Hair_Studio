@@ -75,18 +75,21 @@ function AdminServicesList() {
   };
 
   const handleDraftChange = (field, value) => {
-    setDraft((prev) => {
+    setDraft((previous) => {
       if (field === "price_type" && value === "consultation") {
-        return { ...prev, price_type: value, price: "" };
+        return { ...previous, price_type: value, price: "" };
       }
-      return { ...prev, [field]: value };
+      return { ...previous, [field]: value };
     });
   };
 
   const validateDraft = (data) => {
     const titleOk = (data.title || "").trim() !== "";
-    const descOk = (data.description || "").trim() !== "";
-    const typeOk = ["fixed", "from", "consultation"].includes(data.price_type);
+    const descriptionOk = (data.description || "").trim() !== "";
+    const priceTypeOk = ["fixed", "from", "consultation"].includes(
+      data.price_type,
+    );
+
     let priceOk = true;
     if (data.price_type === "fixed" || data.price_type === "from") {
       priceOk =
@@ -95,7 +98,8 @@ function AdminServicesList() {
         !Number.isNaN(Number(data.price)) &&
         Number(data.price) >= 0;
     }
-    return titleOk && descOk && typeOk && priceOk;
+
+    return titleOk && descriptionOk && priceTypeOk && priceOk;
   };
 
   const handleSave = async (id) => {
@@ -112,6 +116,7 @@ function AdminServicesList() {
 
     try {
       const response = await adminServicesListPost({
+        action: "update",
         id,
         title: draft.title.trim(),
         description: draft.description.trim(),
@@ -124,7 +129,7 @@ function AdminServicesList() {
         clearMessageAfterDelay();
         setEditingId(null);
         setDraft({});
-        fetchServices();
+        await fetchServices();
       } else {
         setMessage({
           text: response.message || "Failed to update the service.",
@@ -143,32 +148,37 @@ function AdminServicesList() {
     }
   };
 
-  const handleToggleActive = async (service) => {
+  const handleDelete = async (service) => {
+    const confirmed = window.confirm(
+      `Permanently delete "${service.title}"? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     setSubmittingId(service.id);
     setMessage({ text: "", type: "" });
 
     try {
       const response = await adminServicesListPost({
+        action: "delete",
         id: service.id,
-        title: service.title,
-        description: service.description,
-        price_type: service.price_type,
-        price: service.price !== null ? Number(service.price) : null,
-        is_active: service.is_active ? 0 : 1,
       });
 
       if (response.status === "success") {
-        setMessage({
-          text: service.is_active
-            ? "Service has been deactivated."
-            : "Service has been reactivated.",
-          type: "success",
-        });
+        setMessage({ text: "Service deleted successfully.", type: "success" });
         clearMessageAfterDelay();
-        fetchServices();
+
+        if (editingId === service.id) {
+          setEditingId(null);
+          setDraft({});
+        }
+
+        await fetchServices();
       } else {
         setMessage({
-          text: response.message || "Failed to update the service status.",
+          text: response.message || "Failed to delete the service.",
           type: "error",
         });
         clearMessageAfterDelay();
@@ -238,12 +248,7 @@ function AdminServicesList() {
           const isSubmitting = submittingId === service.id;
 
           return (
-            <div
-              key={service.id}
-              className={`admin-service-card ${
-                service.is_active ? "" : "inactive"
-              }`}
-            >
+            <div key={service.id} className="admin-service-card">
               <div className="admin-service-card-header">
                 <div>
                   <h6 className="admin-service-card-title">
@@ -258,16 +263,10 @@ function AdminServicesList() {
                       ).toLocaleString()}`}
                   </div>
                 </div>
+
                 <div className="admin-service-badges">
                   <span className="admin-service-badge type">
                     {priceTypeLabel(service.price_type)}
-                  </span>
-                  <span
-                    className={`admin-service-badge ${
-                      service.is_active ? "active" : "inactive"
-                    }`}
-                  >
-                    {service.is_active ? "Active" : "Inactive"}
                   </span>
                 </div>
               </div>
@@ -278,8 +277,10 @@ function AdminServicesList() {
                   <input
                     type="text"
                     value={data.title || ""}
-                    onChange={(e) => handleDraftChange("title", e.target.value)}
-                    disabled={!isEditing}
+                    onChange={(event) =>
+                      handleDraftChange("title", event.target.value)
+                    }
+                    disabled={!isEditing || isSubmitting}
                   />
                 </div>
 
@@ -288,10 +289,10 @@ function AdminServicesList() {
                   <textarea
                     rows="2"
                     value={data.description || ""}
-                    onChange={(e) =>
-                      handleDraftChange("description", e.target.value)
+                    onChange={(event) =>
+                      handleDraftChange("description", event.target.value)
                     }
-                    disabled={!isEditing}
+                    disabled={!isEditing || isSubmitting}
                   />
                 </div>
 
@@ -299,10 +300,10 @@ function AdminServicesList() {
                   <label>Price Type</label>
                   <select
                     value={data.price_type || "fixed"}
-                    onChange={(e) =>
-                      handleDraftChange("price_type", e.target.value)
+                    onChange={(event) =>
+                      handleDraftChange("price_type", event.target.value)
                     }
-                    disabled={!isEditing}
+                    disabled={!isEditing || isSubmitting}
                   >
                     <option value="fixed">Fixed Price</option>
                     <option value="from">From Price</option>
@@ -319,8 +320,14 @@ function AdminServicesList() {
                     value={
                       data.price_type === "consultation" ? "" : data.price || ""
                     }
-                    onChange={(e) => handleDraftChange("price", e.target.value)}
-                    disabled={!isEditing || data.price_type === "consultation"}
+                    onChange={(event) =>
+                      handleDraftChange("price", event.target.value)
+                    }
+                    disabled={
+                      !isEditing ||
+                      isSubmitting ||
+                      data.price_type === "consultation"
+                    }
                   />
                 </div>
               </div>
@@ -344,6 +351,15 @@ function AdminServicesList() {
                     >
                       Cancel
                     </button>
+
+                    <button
+                      type="button"
+                      className="btn-service-delete"
+                      onClick={() => handleDelete(service)}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Deleting..." : "Delete"}
+                    </button>
                   </>
                 ) : (
                   <>
@@ -355,19 +371,14 @@ function AdminServicesList() {
                     >
                       Edit
                     </button>
+
                     <button
                       type="button"
-                      className={`btn-service-toggle ${
-                        service.is_active ? "" : "reactivate"
-                      }`}
-                      onClick={() => handleToggleActive(service)}
+                      className="btn-service-delete"
+                      onClick={() => handleDelete(service)}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting
-                        ? "Updating..."
-                        : service.is_active
-                          ? "Deactivate"
-                          : "Reactivate"}
+                      {isSubmitting ? "Deleting..." : "Delete"}
                     </button>
                     <span className="admin-service-card-subtitle ms-auto">
                       Current price: {formatPrice(service)}
