@@ -37,7 +37,7 @@ try {
 
     $sql = 'SELECT id, title, description, price_type, price, created_at
             FROM services
-            WHERE is_active = 1
+
             ORDER BY created_at DESC';
 
     $stmt     = $pdo->query($sql);
