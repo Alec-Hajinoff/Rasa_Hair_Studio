@@ -7,7 +7,6 @@ import AdminGalleryImages from "./AdminGalleryImages";
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
 import AdminStylistProfile from "./AdminStylistProfile";
-import AdminStylistProfileManager from "./AdminStylistProfileManager";
 
 const NAV_ITEMS = [
   { key: "services", label: "Services" },
@@ -57,12 +56,9 @@ function AdminDashboard() {
       case "profile":
         return (
           <div className="tab-pane-content">
-            {/* Update: notify the manager after a stylist is successfully created. */}
             <AdminStylistProfile
               onCreated={() => setStylistRefreshKey((key) => key + 1)}
             />
-            {/* Update: pass the shared refresh signal to the manager. */}
-            <AdminStylistProfileManager refreshKey={stylistRefreshKey} />
           </div>
         );
 
