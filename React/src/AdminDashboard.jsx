@@ -2,25 +2,21 @@ import React, { useState } from "react";
 import "./AdminDashboard.css";
 import ServiceManager from "./ServiceManager";
 import AdminServicesList from "./AdminServicesList";
-
 import AdminGalleryImages from "./AdminGalleryImages";
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
 const NAV_ITEMS = [
   { key: "services", label: "Services" },
   { key: "images", label: "Images" },
-  { key: "profile", label: "Stylist Profile" },
   { key: "blog", label: "Blog" },
-  { key: "shop", label: "Shop & Orders" },
+  { key: "shop-products", label: "Shop Products" },
+  { key: "shop-orders", label: "Shop Orders" },
 ];
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("services");
   const [servicesRefreshKey, setServicesRefreshKey] = useState(0);
-
   const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
-  const [stylistRefreshKey, setStylistRefreshKey] = useState(0);
-
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
 
   const activeLabel =
@@ -32,7 +28,7 @@ function AdminDashboard() {
         return (
           <div className="tab-pane-content">
             <ServiceManager
-              onSaved={() => setServicesRefreshKey((k) => k + 1)}
+              onSaved={() => setServicesRefreshKey((key) => key + 1)}
             />
             <AdminServicesList key={servicesRefreshKey} />
           </div>
@@ -42,7 +38,7 @@ function AdminDashboard() {
         return (
           <div className="tab-pane-content">
             <AdminGalleryImages
-              onUploadSuccess={() => setGalleryRefreshKey((k) => k + 1)}
+              onUploadSuccess={() => setGalleryRefreshKey((key) => key + 1)}
             />
             <AdminGalleryImagesManager
               key={galleryRefreshKey}
@@ -51,14 +47,14 @@ function AdminDashboard() {
           </div>
         );
 
-      case "profile":
-        return <div className="tab-pane-content"></div>;
-
       case "blog":
         return <div>Blog placeholder</div>;
 
-      case "shop":
-        return <div>Shop & Orders placeholder</div>;
+      case "shop-products":
+        return <div>Shop Products placeholder</div>;
+
+      case "shop-orders":
+        return <div>Shop Orders placeholder</div>;
 
       default:
         return null;
@@ -95,6 +91,7 @@ function AdminDashboard() {
           <div className="d-lg-none d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
             <h5 className="m-0">{activeLabel}</h5>
             <button
+              type="button"
               className="btn btn-outline-dark"
               onClick={() => setOffcanvasOpen(true)}
             >
@@ -126,8 +123,9 @@ function AdminDashboard() {
           <button
             type="button"
             className="btn-close"
+            aria-label="Close menu"
             onClick={() => setOffcanvasOpen(false)}
-          ></button>
+          />
         </div>
 
         <div className="offcanvas-body p-0 pt-3">
