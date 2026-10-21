@@ -16,6 +16,8 @@ function AdminGalleryImagesManager({ refreshKey }) {
   const [isSaving, setIsSaving] = useState(false);
   const [modalFeedback, setModalFeedback] = useState(null);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     fetchImages();
   }, [refreshKey]);
@@ -114,7 +116,7 @@ function AdminGalleryImagesManager({ refreshKey }) {
           {images.map((img) => (
             <div key={img.id} className="gallery-card">
               <img
-                src={`http://localhost:8001${img.image_path}`}
+                src={`${API_BASE_URL}${img.image_path}`}
                 alt={img.title}
                 className={`gallery-thumbnail ${!img.is_active ? "inactive" : ""}`}
                 onClick={() => handleOpenModal(img)}
@@ -136,7 +138,6 @@ function AdminGalleryImagesManager({ refreshKey }) {
         </div>
       )}
 
-      {/* Custom Bootstrap Modal implementation without relying on Bootstrap JS */}
       {selectedImage && (
         <>
           <div className="modal fade show d-block" tabIndex="-1" role="dialog">
@@ -157,7 +158,7 @@ function AdminGalleryImagesManager({ refreshKey }) {
                   <div className="row">
                     <div className="col-md-7 mb-3 mb-md-0">
                       <img
-                        src={`http://localhost:8001${selectedImage.image_path}`}
+                        src={`${API_BASE_URL}${selectedImage.image_path}`}
                         alt={selectedImage.title}
                         className="gallery-modal-img"
                       />

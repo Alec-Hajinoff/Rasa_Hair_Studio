@@ -1,11 +1,9 @@
-//Frontend - backend communication must happen over HTTPS on production
-
-const BackendApi = "http://localhost:8001";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const registerUser = async (formData) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/form_capture.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/form_capture.php`,
       {
         method: "POST",
         headers: {
@@ -27,7 +25,7 @@ export const registerUser = async (formData) => {
 export const loginUser = async (formData) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/login_capture.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/login_capture.php`,
       {
         method: "POST",
         headers: {
@@ -49,7 +47,7 @@ export const loginUser = async (formData) => {
 export const logoutUser = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/logout_component.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/logout_component.php`,
       {
         method: "POST",
         credentials: "include",
@@ -70,7 +68,7 @@ export const logoutUser = async () => {
 export const verifyEmail = async (token) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/verify_email.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/verify_email.php`,
       {
         method: "POST",
         headers: {
@@ -94,7 +92,7 @@ export const verifyEmail = async (token) => {
 export const passwordResetLink = async (email) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/password_reset_link.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/password_reset_link.php`,
       {
         method: "POST",
         headers: {
@@ -119,7 +117,7 @@ export const passwordResetLink = async (email) => {
 export const passwordResetToken = async (token) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/password_reset_token.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/password_reset_token.php`,
       {
         method: "POST",
         headers: {
@@ -146,7 +144,7 @@ export const passwordResetToken = async (token) => {
 export const updatePassword = async (token, newPassword) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/update_password.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/update_password.php`,
       {
         method: "POST",
         headers: {
@@ -176,7 +174,7 @@ export const updatePassword = async (token, newPassword) => {
 export const checkSession = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/check_session.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/check_session.php`,
       {
         method: "GET",
         credentials: "include",
@@ -196,7 +194,7 @@ export const checkSession = async () => {
 export const serviceManager = async (servicesData) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/service_manager.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/service_manager.php`,
       {
         method: "POST",
         headers: {
@@ -220,7 +218,7 @@ export const serviceManager = async (servicesData) => {
 export const customerProfileGet = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/customer_profile_get.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/customer_profile_get.php`,
       {
         method: "GET",
         credentials: "include",
@@ -240,7 +238,7 @@ export const customerProfileGet = async () => {
 export const customerProfilePost = async (profileData) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/customer_profile_post.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/customer_profile_post.php`,
       {
         method: "POST",
         headers: {
@@ -264,7 +262,7 @@ export const customerProfilePost = async (profileData) => {
 export const customerDeleteAccount = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/customer_delete_account.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/customer_delete_account.php`,
       {
         method: "POST",
         headers: {
@@ -287,7 +285,7 @@ export const customerDeleteAccount = async () => {
 export const adminServicesListGet = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_services_list_get.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_services_list_get.php`,
       {
         method: "GET",
         credentials: "include",
@@ -307,7 +305,7 @@ export const adminServicesListGet = async () => {
 export const adminServicesListPost = async (serviceData) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_services_list_post.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_services_list_post.php`,
       {
         method: "POST",
         headers: {
@@ -331,7 +329,7 @@ export const adminServicesListPost = async (serviceData) => {
 export const servicesPriceList = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/services_price_list.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/services_price_list.php`,
       {
         method: "GET",
       },
@@ -350,7 +348,7 @@ export const servicesPriceList = async () => {
 export const adminGalleryImages = async (formData) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_gallery_images.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_gallery_images.php`,
       {
         method: "POST",
 
@@ -372,7 +370,7 @@ export const adminGalleryImages = async (formData) => {
 export const adminGalleryImagesManagerGet = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_gallery_images_manager_get.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_gallery_images_manager_get.php`,
       {
         method: "GET",
         credentials: "include",
@@ -392,7 +390,7 @@ export const adminGalleryImagesManagerGet = async () => {
 export const adminGalleryImagesManagerPost = async (imageData) => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/admin_gallery_images_manager_post.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_gallery_images_manager_post.php`,
       {
         method: "POST",
         headers: {
@@ -416,7 +414,7 @@ export const adminGalleryImagesManagerPost = async (imageData) => {
 export const galleryImages = async () => {
   try {
     const response = await fetch(
-      `${BackendApi}/Rasa_Hair_Studio/PHP/gallery_images.php`,
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/gallery_images.php`,
       {
         method: "GET",
       },

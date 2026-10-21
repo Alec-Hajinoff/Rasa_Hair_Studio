@@ -10,6 +10,8 @@ function GalleryImages() {
 
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     const fetchImages = async () => {
       setIsLoading(true);
@@ -63,7 +65,7 @@ function GalleryImages() {
             {images.map((img) => (
               <div key={img.id} className="gallery-card">
                 <img
-                  src={`http://localhost:8001${img.image_path}`}
+                  src={`${API_BASE_URL}${img.image_path}`}
                   alt={img.title}
                   className="gallery-thumbnail"
                   onClick={() => handleOpenModal(img)}
@@ -97,7 +99,7 @@ function GalleryImages() {
                 </div>
                 <div className="modal-body">
                   <img
-                    src={`http://localhost:8001${selectedImage.image_path}`}
+                    src={`${API_BASE_URL}${selectedImage.image_path}`}
                     alt={selectedImage.title}
                     className="gallery-modal-img"
                   />
