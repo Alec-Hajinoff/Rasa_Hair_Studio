@@ -12,7 +12,6 @@ function AdminGalleryImagesManager({ refreshKey }) {
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [editTitle, setEditTitle] = useState("");
-  const [editIsActive, setEditIsActive] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [modalFeedback, setModalFeedback] = useState(null);
 
@@ -25,12 +24,16 @@ function AdminGalleryImagesManager({ refreshKey }) {
   const fetchImages = async () => {
     setIsLoading(true);
     setError(null);
+
     try {
       const data = await adminGalleryImagesManagerGet();
+
       if (data.error) {
         setError(data.error);
       } else if (Array.isArray(data)) {
         setImages(data);
+      } else {
+        setError("The server returned an unexpected response.");
       }
     } catch (err) {
       setError(err.message || "Failed to load images.");
@@ -41,12 +44,12 @@ function AdminGalleryImagesManager({ refreshKey }) {
 
   const handleOpenModal = (image) => {
     setSelectedImage(image);
-    setEditTitle(image.title);
-    setEditIsActive(image.is_active === 1);
+    setEditTitle(image.title || "");
     setModalFeedback(null);
   };
 
   const handleCloseModal = () => {
+    if (isSaving) return;
     setSelectedImage(null);
     setModalFeedback(null);
   };
@@ -62,35 +65,80 @@ function AdminGalleryImagesManager({ refreshKey }) {
 
     try {
       const response = await adminGalleryImagesManagerPost({
+        action: "update",
         id: selectedImage.id,
-        title: editTitle,
-        is_active: editIsActive ? 1 : 0,
+        title: editTitle.trim(),
       });
 
       if (response.status === "success") {
         setModalFeedback({ type: "success", text: response.message });
 
-        setImages((prev) =>
-          prev.map((img) =>
-            img.id === selectedImage.id
-              ? { ...img, title: editTitle, is_active: editIsActive ? 1 : 0 }
-              : img,
+        setImages((previousImages) =>
+          previousImages.map((image) =>
+            image.id === selectedImage.id
+              ? { ...image, title: editTitle.trim() }
+              : image,
           ),
         );
 
         setTimeout(() => {
-          handleCloseModal();
-        }, 1500);
+          setSelectedImage(null);
+          setModalFeedback(null);
+        }, 1200);
       } else {
         setModalFeedback({
           type: "danger",
-          text: response.message || "Failed to update.",
+          text: response.message || "Failed to update the image.",
         });
       }
     } catch (err) {
       setModalFeedback({
         type: "danger",
-        text: err.message || "An error occurred.",
+        text: err.message || "An error occurred while updating the image.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedImage) return;
+
+    const confirmed = window.confirm(
+      `Permanently delete "${selectedImage.title}" from the gallery? This cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    setIsSaving(true);
+    setModalFeedback(null);
+
+    try {
+      const response = await adminGalleryImagesManagerPost({
+        action: "delete",
+        id: selectedImage.id,
+      });
+
+      if (response.status === "success") {
+        setImages((previousImages) =>
+          previousImages.filter((image) => image.id !== selectedImage.id),
+        );
+        setModalFeedback({ type: "success", text: response.message });
+
+        setTimeout(() => {
+          setSelectedImage(null);
+          setModalFeedback(null);
+        }, 1200);
+      } else {
+        setModalFeedback({
+          type: "danger",
+          text: response.message || "Failed to delete the image.",
+        });
+      }
+    } catch (err) {
+      setModalFeedback({
+        type: "danger",
+        text: err.message || "An error occurred while deleting the image.",
       });
     } finally {
       setIsSaving(false);
@@ -113,47 +161,56 @@ function AdminGalleryImagesManager({ refreshKey }) {
         <p className="text-muted">No images uploaded yet.</p>
       ) : (
         <div className="gallery-grid">
-          {images.map((img) => (
-            <div key={img.id} className="gallery-card">
+          {images.map((image) => (
+            <button
+              key={image.id}
+              type="button"
+              className="gallery-card"
+              onClick={() => handleOpenModal(image)}
+              aria-label={`Edit ${image.title}`}
+            >
               <img
-                src={`${API_BASE_URL}${img.image_path}`}
-                alt={img.title}
-                className={`gallery-thumbnail ${!img.is_active ? "inactive" : ""}`}
-                onClick={() => handleOpenModal(img)}
+                src={`${API_BASE_URL}${image.image_path}`}
+                alt={image.title}
+                className="gallery-thumbnail"
               />
               <div className="gallery-info">
-                <p className="gallery-title" title={img.title}>
-                  {img.title}
+                <p className="gallery-title" title={image.title}>
+                  {image.title}
                 </p>
-                <div className="gallery-status">
-                  {img.is_active ? (
-                    <span className="text-success">● Active</span>
-                  ) : (
-                    <span className="text-danger">○ Inactive</span>
-                  )}
-                </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
 
       {selectedImage && (
         <>
-          <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+          <div
+            className="modal fade show d-block"
+            tabIndex="-1"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gallery-modal-title"
+          >
             <div
               className="modal-dialog modal-lg modal-dialog-centered"
               role="document"
             >
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Edit Image</h5>
+                  <h5 className="modal-title" id="gallery-modal-title">
+                    Edit Image
+                  </h5>
                   <button
                     type="button"
                     className="btn-close"
+                    aria-label="Close"
                     onClick={handleCloseModal}
-                  ></button>
+                    disabled={isSaving}
+                  />
                 </div>
+
                 <div className="modal-body">
                   <div className="row">
                     <div className="col-md-7 mb-3 mb-md-0">
@@ -163,37 +220,29 @@ function AdminGalleryImagesManager({ refreshKey }) {
                         className="gallery-modal-img"
                       />
                     </div>
+
                     <div className="col-md-5">
                       <div className="mb-3">
-                        <label className="form-label">Title</label>
+                        <label
+                          className="form-label"
+                          htmlFor="gallery-image-title"
+                        >
+                          Title
+                        </label>
                         <input
+                          id="gallery-image-title"
                           type="text"
                           className="form-control"
                           value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
+                          onChange={(event) => setEditTitle(event.target.value)}
                           disabled={isSaving}
                         />
-                      </div>
-                      <div className="form-check form-switch mb-3">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          id="activeSwitch"
-                          checked={editIsActive}
-                          onChange={(e) => setEditIsActive(e.target.checked)}
-                          disabled={isSaving}
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="activeSwitch"
-                        >
-                          Active
-                        </label>
                       </div>
 
                       {modalFeedback && (
                         <div
                           className={`alert alert-${modalFeedback.type} py-2`}
+                          role="status"
                         >
                           {modalFeedback.text}
                         </div>
@@ -201,6 +250,7 @@ function AdminGalleryImagesManager({ refreshKey }) {
                     </div>
                   </div>
                 </div>
+
                 <div className="modal-footer">
                   <button
                     type="button"
@@ -212,11 +262,19 @@ function AdminGalleryImagesManager({ refreshKey }) {
                   </button>
                   <button
                     type="button"
+                    className="btn btn-danger me-auto"
+                    onClick={handleDelete}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Please wait..." : "Delete Image"}
+                  </button>
+                  <button
+                    type="button"
                     className="btn btn-primary"
                     onClick={handleSave}
                     disabled={isSaving}
                   >
-                    {isSaving ? "Saving..." : "Save Changes"}
+                    {isSaving ? "Saving..." : "Save Title"}
                   </button>
                 </div>
               </div>

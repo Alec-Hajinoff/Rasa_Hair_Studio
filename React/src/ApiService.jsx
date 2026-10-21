@@ -365,7 +365,7 @@ export const adminGalleryImages = async (formData) => {
   }
 };
 
-// adminGalleryImagesManagerGet() fetches all gallery images for the admin manager.
+// adminGalleryImagesManagerGet() fetchs all gallery records.
 
 export const adminGalleryImagesManagerGet = async () => {
   try {
@@ -378,14 +378,19 @@ export const adminGalleryImagesManagerGet = async () => {
     );
 
     const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to load gallery images.");
+    }
+
     return data;
   } catch (error) {
     console.error("Error fetching gallery images:", error);
-    throw new Error("An error occurred while loading gallery images.");
+    throw new Error(error.message || "An error occurred while loading images.");
   }
 };
 
-// adminGalleryImagesManagerPost() updates a single image's details (title, is_active).
+// adminGalleryImagesManagerPost() allows admins to update image title or delete image.
 
 export const adminGalleryImagesManagerPost = async (imageData) => {
   try {
@@ -402,10 +407,17 @@ export const adminGalleryImagesManagerPost = async (imageData) => {
     );
 
     const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Gallery image request failed.");
+    }
+
     return data;
   } catch (error) {
-    console.error("Error updating gallery image:", error);
-    throw new Error("An error occurred while updating the image.");
+    console.error("Error updating or deleting gallery image:", error);
+    throw new Error(
+      error.message || "An error occurred while processing the image.",
+    );
   }
 };
 
