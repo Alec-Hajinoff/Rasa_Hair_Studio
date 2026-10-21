@@ -5,7 +5,7 @@ import CustomerProfile from "./CustomerProfile";
 import CustomerDeleteAccount from "./CustomerDeleteAccount";
 
 function UserDashboard() {
-  const [activeTab, setActiveTab] = useState("book-service");
+  const [activeTab, setActiveTab] = useState("shop-orders");
 
   return (
     <div className="user-dashboard-container container">
@@ -13,37 +13,42 @@ function UserDashboard() {
         <div className="col-12 col-md-11 col-lg-10 mx-auto">
           <div className="admin-header">
             <p>
-              Welcome to your dashboard. Here you can book and track your
-              appointments and manage your account.
+              Welcome to your dashboard. Here you can view your shop order
+              history and manage your account.
             </p>
           </div>
 
           <ul className="nav nav-tabs mb-4">
             <li className="nav-item">
               <button
-                className={`nav-link ${activeTab === "book-service" ? "active" : ""}`}
-                onClick={() => setActiveTab("book-service")}
+                type="button"
+                className={`nav-link ${
+                  activeTab === "shop-orders" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("shop-orders")}
               >
-                Book a Service
+                Shop Orders
               </button>
             </li>
+
             <li className="nav-item">
               <button
-                className={`nav-link ${activeTab === "my-bookings" ? "active" : ""}`}
-                onClick={() => setActiveTab("my-bookings")}
-              >
-                My Bookings
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link ${activeTab === "account" ? "active" : ""}`}
+                type="button"
+                className={`nav-link ${
+                  activeTab === "account" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("account")}
               >
                 Account
               </button>
             </li>
           </ul>
+
+          {activeTab === "shop-orders" && (
+            <div className="tab-pane-content">
+              <p>Your shop order history will appear here.</p>
+            </div>
+          )}
 
           {activeTab === "account" && (
             <div className="tab-pane-content">
