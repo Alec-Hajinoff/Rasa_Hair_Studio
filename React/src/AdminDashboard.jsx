@@ -6,8 +6,6 @@ import AdminServicesList from "./AdminServicesList";
 import AdminGalleryImages from "./AdminGalleryImages";
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
-import AdminStylistProfile from "./AdminStylistProfile";
-
 const NAV_ITEMS = [
   { key: "services", label: "Services" },
   { key: "images", label: "Images" },
@@ -54,13 +52,7 @@ function AdminDashboard() {
         );
 
       case "profile":
-        return (
-          <div className="tab-pane-content">
-            <AdminStylistProfile
-              onCreated={() => setStylistRefreshKey((key) => key + 1)}
-            />
-          </div>
-        );
+        return <div className="tab-pane-content"></div>;
 
       case "blog":
         return <div>Blog placeholder</div>;
