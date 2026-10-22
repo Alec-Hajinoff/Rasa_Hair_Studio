@@ -1,0 +1,13 @@
+.admin-blog-entry {
+  max-width: 900px;
+}
+
+.admin-blog-entry .form-control:focus {
+  border-color: #8a6b55;
+  box-shadow: 0 0 0 0.2rem rgb(138 107 85 / 20%);
+}
+
+.admin-blog-entry textarea {
+  min-height: 220px;
+  resize: vertical;
+}

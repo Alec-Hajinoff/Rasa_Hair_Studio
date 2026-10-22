@@ -5,6 +5,8 @@ import AdminServicesList from "./AdminServicesList";
 import AdminGalleryImages from "./AdminGalleryImages";
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
+import AdminBlogEntry from "./AdminBlogEntry";
+
 const NAV_ITEMS = [
   { key: "services", label: "Services" },
   { key: "images", label: "Images" },
@@ -48,7 +50,7 @@ function AdminDashboard() {
         );
 
       case "blog":
-        return <div>Blog placeholder</div>;
+        return <AdminBlogEntry />;
 
       case "shop-products":
         return <div>Shop Products placeholder</div>;

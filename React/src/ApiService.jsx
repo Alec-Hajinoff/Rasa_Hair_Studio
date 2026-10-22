@@ -439,3 +439,31 @@ export const galleryImages = async () => {
     throw new Error("An error occurred while loading gallery images.");
   }
 };
+
+// adminBlogEntry() allows admins to write a blog entry.
+
+export const adminBlogEntry = async (formData) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_blog_entry.php`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "The blog post could not be saved.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error saving blog post:", error);
+    throw new Error(
+      error.message || "An error occurred while saving the post.",
+    );
+  }
+};
