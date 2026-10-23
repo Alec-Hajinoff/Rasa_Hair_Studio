@@ -56,7 +56,7 @@ function WhyChooseUs() {
                   </svg>
                   <div className="contact-us-content">
                     <span className="contact-us-value">
-                      50a Southbury Rd, Enfield, EN1 1YB
+                      2 Chaseville Parade, Chaseville Park Rd, London N21 1PG
                     </span>
                   </div>
                 </div>
@@ -77,7 +77,7 @@ function WhyChooseUs() {
                   </svg>
                   <div className="contact-us-content">
                     <a href="tel:02083675888" className="contact-us-value">
-                      020 8367 5888
+                      020 8374 4310
                     </a>
                   </div>
                 </div>
@@ -99,7 +99,7 @@ function WhyChooseUs() {
                       href="mailto:info@lovedayauto.com"
                       className="contact-us-value"
                     >
-                      info@lovedayauto.com
+                      style@rasalstudio.com
                     </a>
                   </div>
                 </div>
