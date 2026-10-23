@@ -12,8 +12,8 @@ function Services() {
             <div>
               <h1 className="services-hero-headline">Our Services & Pricing</h1>
               <p className="services-hero-subheadline">
-                Expert repairs, routine maintenance and MOT testing to keep you
-                safely on the road
+                Discover our professional hair services, tailored to your style
+                and designed to help you look and feel your best.
               </p>
             </div>
           </div>
