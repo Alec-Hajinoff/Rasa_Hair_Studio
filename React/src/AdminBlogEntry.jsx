@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-
 import { adminBlogEntry } from "./ApiService";
 import "./AdminBlogEntry.css";
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 
-function AdminBlogEntry() {
+function AdminBlogEntry({ onPostSaved }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
@@ -69,8 +68,9 @@ function AdminBlogEntry() {
       setTitle("");
       setContent("");
       setImage(null);
-
       event.target.reset();
+
+      onPostSaved?.();
 
       setMessage(result.message || "Blog post saved successfully.");
       setMessageType("success");

@@ -2,32 +2,32 @@ import React, { useEffect, useState } from "react";
 import { adminBlogManagerGet, adminBlogManagerPost } from "./ApiService";
 import "./AdminBlogManager.css";
 
-function AdminBlogManager() {
-  const [posts, setPosts] = useState([]);
+function AdminBlogManager({ posts, setPosts, refreshKey }) {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
-  const loadPosts = async () => {
-    setIsLoading(true);
-    setMessage("");
-    setMessageType("");
-
-    try {
-      const result = await adminBlogManagerGet();
-      setPosts(Array.isArray(result.posts) ? result.posts : []);
-    } catch (error) {
-      setMessage(error.message || "Unable to load blog posts.");
-      setMessageType("danger");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadPosts = async () => {
+      setIsLoading(true);
+      setMessage("");
+      setMessageType("");
+
+      try {
+        const result = await adminBlogManagerGet();
+
+        setPosts(Array.isArray(result.posts) ? result.posts : []);
+      } catch (error) {
+        setMessage(error.message || "Unable to load blog posts.");
+        setMessageType("danger");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     loadPosts();
-  }, []);
+  }, [refreshKey, setPosts]);
 
   const handleDelete = async (post) => {
     const confirmed = window.confirm(
@@ -70,17 +70,7 @@ function AdminBlogManager() {
   return (
     <section className="admin-blog-manager card shadow-sm">
       <div className="card-body">
-        <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-          <h4 className="card-title mb-0">Manage blog posts</h4>
-          <button
-            type="button"
-            className="btn btn-outline-secondary btn-sm"
-            onClick={loadPosts}
-            disabled={isLoading}
-          >
-            Refresh
-          </button>
-        </div>
+        <h4 className="card-title mb-3">Manage blog posts</h4>
 
         {message && (
           <div className={`alert alert-${messageType}`} role="alert">

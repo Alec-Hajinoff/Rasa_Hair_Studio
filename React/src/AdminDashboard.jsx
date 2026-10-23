@@ -22,6 +22,9 @@ function AdminDashboard() {
   const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
 
+  const [blogPosts, setBlogPosts] = useState([]);
+
+  const [blogRefreshKey, setBlogRefreshKey] = useState(0);
   const activeLabel =
     NAV_ITEMS.find((item) => item.key === activeTab)?.label ?? "";
 
@@ -53,9 +56,16 @@ function AdminDashboard() {
       case "blog":
         return (
           <div className="tab-pane-content">
-            <AdminBlogEntry />
+            <AdminBlogEntry
+              onPostSaved={() => setBlogRefreshKey((key) => key + 1)}
+            />
+
             <div className="mt-4">
-              <AdminBlogManager />
+              <AdminBlogManager
+                posts={blogPosts}
+                setPosts={setBlogPosts}
+                refreshKey={blogRefreshKey}
+              />
             </div>
           </div>
         );
