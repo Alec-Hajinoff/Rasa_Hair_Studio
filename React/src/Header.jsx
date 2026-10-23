@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import blue from "./Images/Loveday_Auto_Logo.svg";
+
+import blue from "./Images/Rasa_Hair_Studio_Logo.svg";
 import LogoutComponent from "./LogoutComponent";
 import "./Header.css";
 
@@ -16,8 +17,8 @@ function Header({ isAuthenticated, isLoading, onLogoutComplete }) {
               <img
                 id="logo"
                 src={blue}
-                alt="Loveday Auto Repairs Logo"
-                title="Loveday Auto Repairs"
+                alt="Rasa Hair Studio Logo"
+                title="Rasa Hair Studio"
               />
             </Link>
           </div>
