@@ -1,7 +1,7 @@
 .about-us-hero-wrapper {
   background:
     linear-gradient(rgba(11, 98, 245, 0.3), rgba(11, 98, 245, 0.5)),
-    url("./Images/About_us_hero.png") no-repeat center center;
+    url("./Images/Hero.jpg") no-repeat center center;
   background-size: cover;
   height: 220px;
   width: 100%;
