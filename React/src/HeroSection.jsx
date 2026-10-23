@@ -8,8 +8,7 @@ function HeroSection() {
           <div className="col-12 col-lg-10">
             <div className="hero-content mx-auto">
               <h1 className="hero-heading">
-                Professional vehicle servicing and repairs from a trusted local
-                garage.
+                Professional hair styling and treatments tailored to you.
               </h1>
             </div>
           </div>
