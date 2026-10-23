@@ -467,3 +467,61 @@ export const adminBlogEntry = async (formData) => {
     );
   }
 };
+
+// adminBlogManagerGet() retrieves all blog posts for the admin manager.
+
+export const adminBlogManagerGet = async () => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_blog_manager_get.php`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "Failed to load blog posts.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching blog posts:", error);
+    throw new Error(
+      error.message || "An error occurred while loading blog posts.",
+    );
+  }
+};
+
+// adminBlogManagerPost() allows admins to delete a blog post and its featured image.
+
+export const adminBlogManagerPost = async (postData) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_blog_manager_post.php`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(postData),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "The blog post could not be deleted.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error deleting blog post:", error);
+    throw new Error(
+      error.message || "An error occurred while deleting the blog post.",
+    );
+  }
+};
