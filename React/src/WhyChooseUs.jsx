@@ -3,10 +3,10 @@ import "./WhyChooseUs.css";
 
 function WhyChooseUs() {
   const reasons = [
-    "Family-run since 1926",
-    "Transparent pricing - no hidden fees",
-    "Free collection & delivery",
-    "All work backed by 12-month warranty",
+    "Personalised hair care tailored to you",
+    "Professional service and attention to detail",
+    "High-quality products and treatments",
+    "Dedicated to helping you look and feel your best",
   ];
 
   return (
