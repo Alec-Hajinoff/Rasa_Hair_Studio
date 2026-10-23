@@ -45,7 +45,16 @@ if (! isset($_FILES['images']) || empty($_FILES['images']['name'][0])) {
     exit;
 }
 
-$uploadDir         = 'C:/xampp/htdocs/Rasa_Hair_Studio/uploads/image_gallery/';
+$config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+if ($config === false || empty($config['UPLOAD_ROOT'])) {
+    error_log('Failed to load UPLOAD_ROOT from .env');
+    echo json_encode(['status' => 'error', 'message' => 'Server configuration error.']);
+    exit;
+}
+
+$uploadRoot = rtrim($config['UPLOAD_ROOT'], '/\\');
+
+$uploadDir         = $uploadRoot . '/Rasa_Hair_Studio/uploads/image_gallery/';
 $relativeWebPath   = '/Rasa_Hair_Studio/uploads/image_gallery/';
 $maxFileSize       = 2 * 1024 * 1024;
 $allowedTypes      = ['image/jpeg', 'image/png'];
@@ -104,7 +113,6 @@ try {
         $destination = $uploadDir . $fileName;
 
         if (move_uploaded_file($fileTmpName, $destination)) {
-
             try {
                 $stmt->execute([
                     ':title'      => $title,
@@ -113,7 +121,6 @@ try {
                 $successes[] = $fileName;
             } catch (PDOException $e) {
                 $errors[] = "Database error while saving $fileName.";
-
                 unlink($destination);
             }
         } else {
@@ -139,11 +146,11 @@ try {
             'message' => 'Upload failed. ' . implode(' ', $errors),
         ]);
     }
-
 } catch (PDOException $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
+
     file_put_contents('error_log.txt', $e->getMessage() . PHP_EOL, FILE_APPEND);
     echo json_encode(['status' => 'error', 'message' => 'Database error occurred.']);
 } finally {
