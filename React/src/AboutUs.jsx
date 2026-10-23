@@ -12,7 +12,8 @@ function AboutUs() {
             <div>
               <h1 className="about-us-hero-headline">Roots in the Community</h1>
               <p className="services-hero-subheadline">
-                A Century of Motoring Heritage
+                Discover our professional hair services, tailored to your style
+                and designed to help you look and feel your best.
               </p>
             </div>
           </div>
