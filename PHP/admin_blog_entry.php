@@ -10,7 +10,7 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowed_origins, true)) {
     header("Access-Control-Allow-Origin: $origin");
 } else {
-    header('HTTP/1.1 403 Forbidden');
+    http_response_code(403);
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Origin not allowed.']);
     exit;
@@ -60,14 +60,25 @@ if (mb_strlen($title, 'UTF-8') > 255) {
     exit;
 }
 
-$imagePath       = null;
-$destination     = null;
-$uploadDir       = 'C:/xampp/htdocs/Rasa_Hair_Studio/uploads/blog_images/';
+$config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+if ($config === false || empty($config['UPLOAD_ROOT'])) {
+    error_log('admin_blog_entry.php: Failed to load UPLOAD_ROOT from .env');
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Server configuration error.']);
+    exit;
+}
+
+$uploadRoot = rtrim($config['UPLOAD_ROOT'], '/\\');
+
+$uploadDir       = $uploadRoot . '/Rasa_Hair_Studio/uploads/blog_images/';
 $relativeWebPath = '/Rasa_Hair_Studio/uploads/blog_images/';
 $maxFileSize     = 2 * 1024 * 1024;
 
-try {
+$imagePath   = null;
+$destination = null;
+$pdo         = null;
 
+try {
     $hasImage = isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE;
 
     if ($hasImage) {
@@ -142,7 +153,6 @@ try {
         'id'      => (int) $pdo->lastInsertId(),
     ]);
 } catch (RuntimeException $e) {
-
     if ($destination !== null && is_file($destination)) {
         unlink($destination);
     }
@@ -150,7 +160,6 @@ try {
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 } catch (Throwable $e) {
-
     if ($destination !== null && is_file($destination)) {
         unlink($destination);
     }
