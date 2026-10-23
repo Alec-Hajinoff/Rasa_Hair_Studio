@@ -525,3 +525,29 @@ export const adminBlogManagerPost = async (postData) => {
     );
   }
 };
+
+// blog() displays blog entries on the public blog page, with the most recent post first.
+
+export const blog = async () => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/blog.php`,
+      {
+        method: "GET",
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "Failed to load blog posts.");
+    }
+
+    return data.posts;
+  } catch (error) {
+    console.error("Error fetching blog posts:", error);
+    throw new Error(
+      error.message || "An error occurred while loading blog posts.",
+    );
+  }
+};
