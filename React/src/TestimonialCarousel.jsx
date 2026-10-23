@@ -4,24 +4,12 @@ import "./TestimonialCarousel.css";
 function TestimonialCarousel() {
   const testimonials = [
     {
-      name: "Oliver",
-      text: "Brilliant service from start to finish! They fitted me in for an urgent MOT and full service at short notice. Honest advice and very reasonable prices.",
-    },
-    {
       name: "Charlotte",
-      text: "I've been taking my car to Loveday for years. Their free collection and delivery service makes getting repairs done completely stress-free. Exceptional workmanship!",
-    },
-    {
-      name: "Thomas",
-      text: "Top-tier garage. Transparent pricing with no hidden surprises when the bill arrived. My engine runs like an absolute dream now.",
+      text: "A wonderful experience from start to finish! The stylist took the time to understand exactly what I wanted, and I absolutely love the result. Highly recommended!",
     },
     {
       name: "Hannah",
-      text: "Friendly, family-run atmosphere and extremely professional mechanics. They diagnosed a tricky electrical fault that another garage missed entirely.",
-    },
-    {
-      name: "Arthur",
-      text: "First-class experience! Prompt communication, excellent workmanship, and my car was returned sparkling clean inside and out. Highly recommended.",
+      text: "Such a lovely hair studio with a friendly atmosphere and excellent attention to detail. My hair looks and feels amazing, and I couldn't be happier with the results.",
     },
   ];
 
