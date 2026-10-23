@@ -57,7 +57,6 @@ if ($postId === false || $postId === null || $postId < 1) {
 $pdo = null;
 
 try {
-
     $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -91,42 +90,54 @@ try {
                 'admin_blog_manager_post.php: Unexpected image_path for blog post ID ' . $postId
             );
         } else {
-            $uploadDir         = 'C:/xampp/htdocs/Rasa_Hair_Studio/uploads/blog_images/';
-            $uploadDirRealPath = realpath($uploadDir);
 
-            if ($uploadDirRealPath === false) {
+            $config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
 
+            if ($config === false || empty($config['UPLOAD_ROOT'])) {
                 $imageDeleted = false;
                 error_log(
-                    'admin_blog_manager_post.php: Blog image directory does not exist: ' . $uploadDir
+                    'admin_blog_manager_post.php: Failed to load UPLOAD_ROOT from .env'
                 );
             } else {
 
-                $fileName          = $matches[1] . '.' . strtolower($matches[2]);
-                $imageFile         = $uploadDirRealPath . DIRECTORY_SEPARATOR . $fileName;
-                $imageFileRealPath = realpath($imageFile);
+                $uploadRoot = rtrim($config['UPLOAD_ROOT'], '/\\');
 
-                if ($imageFileRealPath === false) {
-                    $imageDeleted = true;
+                $uploadDir         = $uploadRoot . '/Rasa_Hair_Studio/uploads/blog_images/';
+                $uploadDirRealPath = realpath($uploadDir);
+
+                if ($uploadDirRealPath === false) {
+                    $imageDeleted = false;
+                    error_log(
+                        'admin_blog_manager_post.php: Blog image directory does not exist: ' . $uploadDir
+                    );
                 } else {
-                    $resolvedDir        = strtolower(str_replace('\\', '/', rtrim($uploadDirRealPath, '\\/')));
-                    $resolvedFile       = strtolower(str_replace('\\', '/', $imageFileRealPath));
-                    $expectedFilePrefix = $resolvedDir . '/';
+                    $fileName          = $matches[1] . '.' . strtolower($matches[2]);
+                    $imageFile         = $uploadDirRealPath . DIRECTORY_SEPARATOR . $fileName;
+                    $imageFileRealPath = realpath($imageFile);
 
-                    if (
-                        strpos($resolvedFile, $expectedFilePrefix) !== 0 ||
-                        ! is_file($imageFileRealPath)
-                    ) {
-                        $imageDeleted = false;
-                        error_log(
-                            'admin_blog_manager_post.php: Resolved image is outside the blog image directory for post ID ' . $postId
-                        );
-                    } elseif (! unlink($imageFileRealPath)) {
+                    if ($imageFileRealPath === false) {
 
-                        $imageDeleted = false;
-                        error_log(
-                            'admin_blog_manager_post.php: unlink failed for ' . $imageFileRealPath
-                        );
+                        $imageDeleted = true;
+                    } else {
+
+                        $resolvedDir        = strtolower(str_replace('\\', '/', rtrim($uploadDirRealPath, '\\/')));
+                        $resolvedFile       = strtolower(str_replace('\\', '/', $imageFileRealPath));
+                        $expectedFilePrefix = $resolvedDir . '/';
+
+                        if (
+                            strpos($resolvedFile, $expectedFilePrefix) !== 0 ||
+                            ! is_file($imageFileRealPath)
+                        ) {
+                            $imageDeleted = false;
+                            error_log(
+                                'admin_blog_manager_post.php: Resolved image is outside the blog image directory for post ID ' . $postId
+                            );
+                        } elseif (! unlink($imageFileRealPath)) {
+                            $imageDeleted = false;
+                            error_log(
+                                'admin_blog_manager_post.php: unlink failed for ' . $imageFileRealPath
+                            );
+                        }
                     }
                 }
             }
@@ -147,7 +158,6 @@ try {
         ]);
     }
 } catch (Throwable $e) {
-
     error_log('admin_blog_manager_post.php: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => 'The blog post could not be deleted.']);
