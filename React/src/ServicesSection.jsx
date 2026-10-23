@@ -9,23 +9,23 @@ function ServicesSection() {
   const servicesData = [
     {
       id: 1,
-      title: "MOT & Servicing",
+      title: "Haircuts & Styling",
       description:
-        "Comprehensive statutory MOT testing and routine multi-point vehicle servicing designed to keep your car running safely and efficiently.",
+        "Professional haircuts and styling tailored to your individual preferences, hair type, and desired look.",
       icon: motIcon,
     },
     {
       id: 2,
-      title: "Brakes & Tyres",
+      title: "Colouring & Highlights",
       description:
-        "Expert brake inspections, pad and disc replacements, alongside professional tyre fitting, balancing, and puncture repairs.",
+        "Beautiful, personalised hair colour services, from natural-looking tones and highlights to a fresh, vibrant new look.",
       icon: wheelIcon,
     },
     {
       id: 3,
-      title: "Diagnostics & Repairs",
+      title: "Hair Treatments",
       description:
-        "Advanced computerised engine diagnostics to pinpoint fault codes quickly, backed by high-quality mechanical repairs.",
+        "Nourishing hair treatments designed to improve manageability, enhance shine, and leave your hair looking and feeling its best.",
       icon: diagnosticsIcon,
     },
   ];
