@@ -1,86 +1,195 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { testimonialCarousel } from "./ApiService";
 import "./TestimonialCarousel.css";
 
 function TestimonialCarousel() {
-  const testimonials = [
-    {
-      name: "Charlotte",
-      text: "A wonderful experience from start to finish! The stylist took the time to understand exactly what I wanted, and I absolutely love the result. Highly recommended!",
-    },
-    {
-      name: "Hannah",
-      text: "Such a lovely hair studio with a friendly atmosphere and excellent attention to detail. My hair looks and feels amazing, and I couldn't be happier with the results.",
-    },
-  ];
+  const [reviewData, setReviewData] = useState({
+    rating: null,
+    userRatingCount: null,
+    googleMapsUri: "",
+    reviews: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    testimonialCarousel()
+      .then((data) => {
+        if (isMounted) {
+          setReviewData(data);
+        }
+      })
+      .catch((fetchError) => {
+        if (isMounted) {
+          setError(fetchError.message);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const reviews = reviewData.reviews || [];
 
   return (
     <section className="testimonial-section py-4">
       <div className="text-center mb-4">
         <h2 className="testimonial-section-title">What Our Customers Say</h2>
+
+        {reviewData.rating !== null && (
+          <p className="testimonial-business-rating">
+            {reviewData.rating} out of 5
+            {reviewData.userRatingCount
+              ? ` · ${reviewData.userRatingCount} Google ratings`
+              : ""}
+            {reviewData.googleMapsUri && (
+              <>
+                {" · "}
+                <a
+                  href={reviewData.googleMapsUri}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Google Maps
+                </a>
+              </>
+            )}
+          </p>
+        )}
       </div>
 
-      <div
-        id="lovedayTestimonialCarousel"
-        className="carousel slide testimonial-carousel-container"
-        data-bs-ride="carousel"
-        data-bs-interval="5000"
-      >
-        <div className="carousel-inner">
-          {testimonials.map((item, index) => (
-            <div
-              key={index}
-              className={`carousel-item ${index === 0 ? "active" : ""}`}
-            >
-              <div className="testimonial-card">
-                <div className="testimonial-stars mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      className="bi bi-star-fill me-1"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="testimonial-text mb-4">"{item.text}"</p>
-                <div className="testimonial-author-info">
-                  <h5 className="testimonial-author-name">{item.name}</h5>
-                </div>
+      {loading && (
+        <p className="testimonial-status" role="status">
+          Loading reviews…
+        </p>
+      )}
+
+      {!loading && error && (
+        <p className="testimonial-status testimonial-error" role="alert">
+          {error}
+        </p>
+      )}
+
+      {!loading && !error && reviews.length === 0 && (
+        <p className="testimonial-status">No Google reviews are available.</p>
+      )}
+
+      {!loading && !error && reviews.length > 0 && (
+        <div
+          id="googleTestimonialCarousel"
+          className="carousel slide testimonial-carousel-container"
+          data-bs-ride={reviews.length > 1 ? "carousel" : undefined}
+          data-bs-interval="5000"
+        >
+          <div className="carousel-inner">
+            {reviews.map((item, index) => (
+              <div
+                key={`${item.authorName}-${index}`}
+                className={`carousel-item ${index === 0 ? "active" : ""}`}
+              >
+                <article className="testimonial-card">
+                  <div
+                    className="testimonial-stars mb-3"
+                    aria-label={`${item.rating} out of 5 stars`}
+                  >
+                    {"★".repeat(
+                      Math.max(0, Math.min(5, Math.round(item.rating))),
+                    )}
+                    {"☆".repeat(
+                      5 - Math.max(0, Math.min(5, Math.round(item.rating))),
+                    )}
+                  </div>
+
+                  <p className="testimonial-text mb-4">
+                    {item.text ||
+                      "This reviewer did not leave written feedback."}
+                  </p>
+
+                  <div className="testimonial-author-info">
+                    {item.authorPhotoUri && (
+                      <img
+                        className="testimonial-author-photo"
+                        src={item.authorPhotoUri}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                      />
+                    )}
+                    <h3 className="testimonial-author-name">
+                      {item.authorUri ? (
+                        <a
+                          href={item.authorUri}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {item.authorName}
+                        </a>
+                      ) : (
+                        item.authorName
+                      )}
+                    </h3>
+                    {item.publishedAt && (
+                      <span className="testimonial-review-date">
+                        {item.publishedAt}
+                      </span>
+                    )}
+                    {item.googleMapsUri && (
+                      <a
+                        className="testimonial-review-link"
+                        href={item.googleMapsUri}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View on Google Maps
+                      </a>
+                    )}
+                  </div>
+
+                  <p className="testimonial-attribution">
+                    Reviews from Google Maps
+                  </p>
+                </article>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <button
-          className="carousel-control-prev"
-          type="button"
-          data-bs-target="#lovedayTestimonialCarousel"
-          data-bs-slide="prev"
-        >
-          <span
-            className="carousel-control-prev-icon"
-            aria-hidden="true"
-          ></span>
-          <span className="visually-hidden">Previous</span>
-        </button>
-        <button
-          className="carousel-control-next"
-          type="button"
-          data-bs-target="#lovedayTestimonialCarousel"
-          data-bs-slide="next"
-        >
-          <span
-            className="carousel-control-next-icon"
-            aria-hidden="true"
-          ></span>
-          <span className="visually-hidden">Next</span>
-        </button>
-      </div>
+          {reviews.length > 1 && (
+            <>
+              <button
+                className="carousel-control-prev"
+                type="button"
+                data-bs-target="#googleTestimonialCarousel"
+                data-bs-slide="prev"
+                aria-label="Previous review"
+              >
+                <span
+                  className="carousel-control-prev-icon"
+                  aria-hidden="true"
+                />
+              </button>
+              <button
+                className="carousel-control-next"
+                type="button"
+                data-bs-target="#googleTestimonialCarousel"
+                data-bs-slide="next"
+                aria-label="Next review"
+              >
+                <span
+                  className="carousel-control-next-icon"
+                  aria-hidden="true"
+                />
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </section>
   );
 }

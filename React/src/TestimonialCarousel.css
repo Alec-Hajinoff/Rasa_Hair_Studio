@@ -71,3 +71,37 @@
   padding: 1.25rem;
   background-size: 45%, 45%;
 }
+
+.testimonial-business-rating {
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+.testimonial-status {
+  color: var(--color-text-main);
+  text-align: center;
+  padding: 1rem;
+}
+
+.testimonial-error {
+  color: #a32626;
+}
+
+.testimonial-author-photo {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+.testimonial-review-date,
+.testimonial-attribution {
+  color: var(--color-text-main);
+  font-size: var(--font-size-sm);
+}
+
+.testimonial-review-link {
+  color: var(--color-text-main);
+  margin-top: 0.25rem;
+}

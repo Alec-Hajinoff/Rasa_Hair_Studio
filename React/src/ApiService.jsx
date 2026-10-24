@@ -551,3 +551,29 @@ export const blog = async () => {
     );
   }
 };
+
+// testimonialCarousel() retrieves Google reviews for display in the testimonial carousel on the homepage.
+
+export const testimonialCarousel = async () => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/testimonial_carousel.php`,
+      {
+        method: "GET",
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Failed to load Google reviews.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching Google reviews:", error);
+    throw new Error(
+      error.message || "An error occurred while loading reviews.",
+    );
+  }
+};
