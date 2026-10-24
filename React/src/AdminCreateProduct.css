@@ -1,0 +1,59 @@
+.admin-create-product {
+  max-width: 720px;
+  padding: 1.25rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.admin-create-product__heading {
+  margin-bottom: 1.25rem;
+}
+
+.admin-create-product__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.admin-create-product__field label {
+  font-weight: 600;
+}
+
+.admin-create-product__field input,
+.admin-create-product__field textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #adb5bd;
+  border-radius: 0.3rem;
+  font: inherit;
+}
+
+.admin-create-product__field input:focus,
+.admin-create-product__field textarea:focus {
+  border-color: #495057;
+  outline: 2px solid rgb(73 80 87 / 20%);
+}
+
+.admin-create-product__field small {
+  color: #6c757d;
+}
+
+.admin-create-product__selected-file {
+  overflow-wrap: anywhere;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.admin-create-product__message {
+  margin: 0 0 1rem;
+}
+
+.admin-create-product__message--error {
+  color: #b02a37;
+}
+
+.admin-create-product__message--success {
+  color: #146c43;
+}

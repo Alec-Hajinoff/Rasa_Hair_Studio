@@ -577,3 +577,31 @@ export const testimonialCarousel = async () => {
     );
   }
 };
+
+// adminCreateProduct() allows admins to create a new product for the shop.
+
+export const adminCreateProduct = async (formData) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_create_product.php`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "The product could not be saved.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error saving product:", error);
+    throw new Error(
+      error.message || "An error occurred while saving the product.",
+    );
+  }
+};

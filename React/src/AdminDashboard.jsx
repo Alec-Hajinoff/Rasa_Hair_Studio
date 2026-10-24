@@ -5,6 +5,7 @@ import AdminServicesList from "./AdminServicesList";
 import AdminGalleryImages from "./AdminGalleryImages";
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
+import AdminCreateProduct from "./AdminCreateProduct";
 import AdminBlogManager from "./AdminBlogManager";
 import AdminBlogEntry from "./AdminBlogEntry";
 
@@ -71,7 +72,11 @@ function AdminDashboard() {
         );
 
       case "shop-products":
-        return <div>Shop Products placeholder</div>;
+        return (
+          <div className="tab-pane-content">
+            <AdminCreateProduct />
+          </div>
+        );
 
       case "shop-orders":
         return <div>Shop Orders placeholder</div>;
