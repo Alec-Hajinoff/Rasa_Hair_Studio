@@ -5,6 +5,7 @@ import AdminServicesList from "./AdminServicesList";
 import AdminGalleryImages from "./AdminGalleryImages";
 import AdminGalleryImagesManager from "./AdminGalleryImagesManager";
 
+import AdminManageProducts from "./AdminManageProducts";
 import AdminCreateProduct from "./AdminCreateProduct";
 import AdminBlogManager from "./AdminBlogManager";
 import AdminBlogEntry from "./AdminBlogEntry";
@@ -23,6 +24,7 @@ function AdminDashboard() {
   const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
 
+  const [productsRefreshKey, setProductsRefreshKey] = useState(0);
   const [blogPosts, setBlogPosts] = useState([]);
 
   const [blogRefreshKey, setBlogRefreshKey] = useState(0);
@@ -74,7 +76,10 @@ function AdminDashboard() {
       case "shop-products":
         return (
           <div className="tab-pane-content">
-            <AdminCreateProduct />
+            <AdminCreateProduct
+              onProductSaved={() => setProductsRefreshKey((key) => key + 1)}
+            />
+            <AdminManageProducts refreshKey={productsRefreshKey} />
           </div>
         );
 

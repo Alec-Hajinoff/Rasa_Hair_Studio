@@ -605,3 +605,61 @@ export const adminCreateProduct = async (formData) => {
     );
   }
 };
+
+// adminManageProductsGet() displays all products in the admin dashboard, with the most recent product first.
+
+export const adminManageProductsGet = async () => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_manage_products_get.php`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "Products could not be loaded.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw new Error(
+      error.message || "An error occurred while loading products.",
+    );
+  }
+};
+
+// adminManageProductsPost() allows admins to delete a product and its associated image.
+
+export const adminManageProductsPost = async (productId) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_manage_products_post.php`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ id: productId }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "The product could not be deleted.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    throw new Error(
+      error.message || "An error occurred while deleting the product.",
+    );
+  }
+};
