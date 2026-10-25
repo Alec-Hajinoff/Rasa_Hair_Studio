@@ -81,10 +81,6 @@ function Shop() {
                     <div className="card-body">
                       <h2 className="card-title h5">{product.name}</h2>
 
-                      {product.description && (
-                        <p className="card-text">{product.description}</p>
-                      )}
-
                       <p className="card-text fw-bold">
                         £{Number(product.price_gbp).toFixed(2)}
                       </p>
