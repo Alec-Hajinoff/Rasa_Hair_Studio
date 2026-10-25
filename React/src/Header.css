@@ -9,6 +9,33 @@
   border-top-right-radius: 6px;
 }
 
+.header-account-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  min-height: 40px;
+}
+
+.header-auth-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.header-basket-link {
+  color: var(--color-text-inverse);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-basket-link:hover,
+.header-basket-link.active {
+  color: var(--color-text-inverse);
+  text-decoration: underline;
+}
+
 .header-wrapper .header-btn-ghost {
   background: transparent;
   color: var(--color-text-inverse);
@@ -60,4 +87,10 @@
   background-color: var(--color-primary-shade);
   color: var(--color-text-main);
   text-decoration: none;
+}
+
+@media (max-width: 767.98px) {
+  .header-account-actions {
+    justify-content: flex-start;
+  }
 }

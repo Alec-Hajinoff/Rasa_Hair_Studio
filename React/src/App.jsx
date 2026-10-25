@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
+import { BasketProvider } from "./BasketContext";
 import ScrollToTop from "./ScrollToTop";
 import Header from "./Header";
 import Footer from "./Footer";
 import AppRoutes from "./AppRoutes";
 import NavigationBar from "./NavigationBar";
 import "./App.css";
-
-import { checkSession } from "./ApiService";
 
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,6 +16,7 @@ function AppContent() {
 
   const verifySession = useCallback(async () => {
     setIsLoading(true);
+
     try {
       const result = await checkSession();
       setIsAuthenticated(result.authenticated);
@@ -60,8 +60,10 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <ScrollToTop />
-      <AppContent />
+      <BasketProvider>
+        <ScrollToTop />
+        <AppContent />
+      </BasketProvider>
     </Router>
   );
 }

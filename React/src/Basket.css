@@ -1,0 +1,50 @@
+.basket-page {
+  padding: 1rem 0 2rem;
+}
+
+.basket-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.basket-item-image {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.basket-item-details {
+  flex: 1;
+}
+
+.basket-quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.basket-line-total {
+  white-space: nowrap;
+}
+
+.basket-summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .basket-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .basket-line-total {
+    width: 100%;
+    text-align: right;
+  }
+}

@@ -1,12 +1,13 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-
+import { useBasket } from "./BasketContext";
 import blue from "./Images/Rasa_Hair_Studio_Logo.svg";
 import LogoutComponent from "./LogoutComponent";
 import "./Header.css";
 
 function Header({ isAuthenticated, isLoading, onLogoutComplete }) {
   const location = useLocation();
+  const { itemCount } = useBasket();
 
   return (
     <header className="header-wrapper">
@@ -23,33 +24,47 @@ function Header({ isAuthenticated, isLoading, onLogoutComplete }) {
             </Link>
           </div>
 
-          <div className="col-12 col-md-6 text-end d-flex align-items-center justify-content-md-end justify-content-start gap-3">
-            {!isLoading &&
-              (isAuthenticated ? (
-                <div className="d-flex align-items-center justify-content-end w-100">
-                  <LogoutComponent onLogoutComplete={onLogoutComplete} />
-                </div>
-              ) : (
-                <div className="d-flex align-items-center justify-content-end gap-3 w-100">
-                  <Link
-                    to="/UserLogin"
-                    className={`header-btn-ghost ${
-                      location.pathname === "/UserLogin" ? "active" : ""
-                    }`}
-                  >
-                    Log in
-                  </Link>
+          <div className="col-12 col-md-6">
+            <div className="header-account-actions">
+              <Link
+                to="/Basket"
+                className={`header-basket-link ${
+                  location.pathname.toLowerCase() === "/basket" ? "active" : ""
+                }`}
+                aria-label={`Basket, ${itemCount} ${
+                  itemCount === 1 ? "item" : "items"
+                }`}
+              >
+                Basket <span className="badge text-bg-light">{itemCount}</span>
+              </Link>
 
-                  <Link
-                    to="/UserRegistration"
-                    className={`header-btn-signup ${
-                      location.pathname === "/UserRegistration" ? "active" : ""
-                    }`}
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              ))}
+              {!isLoading &&
+                (isAuthenticated ? (
+                  <LogoutComponent onLogoutComplete={onLogoutComplete} />
+                ) : (
+                  <div className="header-auth-links">
+                    <Link
+                      to="/UserLogin"
+                      className={`header-btn-ghost ${
+                        location.pathname === "/UserLogin" ? "active" : ""
+                      }`}
+                    >
+                      Log in
+                    </Link>
+
+                    <Link
+                      to="/UserRegistration"
+                      className={`header-btn-signup ${
+                        location.pathname === "/UserRegistration"
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      Sign up
+                    </Link>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       </div>

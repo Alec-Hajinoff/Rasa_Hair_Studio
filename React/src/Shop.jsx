@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { shopGetProducts } from "./ApiService";
+import { useBasket } from "./BasketContext";
 import "./Shop.css";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Shop() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const { items, addItem, updateQuantity } = useBasket();
 
   useEffect(() => {
     let isMounted = true;
 
-    const loadProducts = async () => {
+    async function loadProducts() {
       try {
         const productList = await shopGetProducts();
 
@@ -27,7 +30,7 @@ function Shop() {
           setIsLoading(false);
         }
       }
-    };
+    }
 
     loadProducts();
 
@@ -36,15 +39,25 @@ function Shop() {
     };
   }, []);
 
-  const getProductImageUrl = (imagePath) => {
-    if (!imagePath) return null;
+  function getProductImageUrl(imagePath) {
+    if (!imagePath) {
+      return null;
+    }
 
     try {
       return new URL(imagePath, API_BASE_URL).toString();
     } catch {
       return imagePath;
     }
-  };
+  }
+
+  function getBasketQuantity(productId) {
+    const basketItem = items.find(
+      (item) => String(item.id) === String(productId),
+    );
+
+    return basketItem ? basketItem.quantity : 0;
+  }
 
   return (
     <div className="container">
@@ -53,11 +66,13 @@ function Shop() {
         <p>Browse products from Rasa Hair Studio.</p>
 
         {isLoading && <p>Loading products...</p>}
+
         {!isLoading && errorMessage && (
           <div className="alert alert-danger" role="alert">
             {errorMessage}
           </div>
         )}
+
         {!isLoading && !errorMessage && products.length === 0 && (
           <p>No products are currently available.</p>
         )}
@@ -66,10 +81,11 @@ function Shop() {
           <div className="row g-4">
             {products.map((product) => {
               const imageUrl = getProductImageUrl(product.image_path);
+              const quantity = getBasketQuantity(product.id);
 
               return (
                 <div className="col-12 col-sm-6 col-lg-4" key={product.id}>
-                  <div className="card h-100 shop-product-card">
+                  <article className="card h-100 shop-product-card">
                     {imageUrl && (
                       <img
                         src={imageUrl}
@@ -84,8 +100,52 @@ function Shop() {
                       <p className="card-text fw-bold">
                         £{Number(product.price_gbp).toFixed(2)}
                       </p>
+
+                      {quantity === 0 ? (
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => addItem(product)}
+                        >
+                          Add
+                        </button>
+                      ) : (
+                        <div
+                          className="shop-quantity-control"
+                          aria-label={`${product.name} quantity in basket`}
+                        >
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            aria-label={`Decrease ${product.name} quantity`}
+                            onClick={() =>
+                              updateQuantity(product.id, quantity - 1)
+                            }
+                          >
+                            −
+                          </button>
+
+                          <span
+                            className="shop-quantity-value"
+                            aria-live="polite"
+                          >
+                            {quantity}
+                          </span>
+
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            aria-label={`Increase ${product.name} quantity`}
+                            onClick={() =>
+                              updateQuantity(product.id, quantity + 1)
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  </article>
                 </div>
               );
             })}
