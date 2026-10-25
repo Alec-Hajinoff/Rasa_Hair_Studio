@@ -635,7 +635,12 @@ export const adminManageProductsGet = async () => {
 
 // adminManageProductsPost() allows admins to delete a product and its associated image.
 
-export const adminManageProductsPost = async (productId) => {
+export const adminManageProductsPost = async (productData) => {
+  const requestData =
+    typeof productData === "object" && productData !== null
+      ? productData
+      : { action: "delete", id: productData };
+
   try {
     const response = await fetch(
       `${API_BASE_URL}/Rasa_Hair_Studio/PHP/admin_manage_products_post.php`,
@@ -645,21 +650,23 @@ export const adminManageProductsPost = async (productId) => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ id: productId }),
+        body: JSON.stringify(requestData),
       },
     );
 
     const data = await response.json();
 
     if (!response.ok || data.status !== "success") {
-      throw new Error(data.message || "The product could not be deleted.");
+      throw new Error(
+        data.message || "The product request could not be completed.",
+      );
     }
 
     return data;
   } catch (error) {
-    console.error("Error deleting product:", error);
+    console.error("Error managing product:", error);
     throw new Error(
-      error.message || "An error occurred while deleting the product.",
+      error.message || "An error occurred while managing the product.",
     );
   }
 };

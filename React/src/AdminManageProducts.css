@@ -45,6 +45,23 @@
   overflow-wrap: anywhere;
 }
 
+.admin-manage-products__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.admin-manage-products__stock-label {
+  margin: 0;
+  color: #495057;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.admin-manage-products__actions .form-select {
+  min-width: 145px;
+}
+
 .admin-manage-products__message {
   margin-bottom: 1rem;
 }
@@ -61,5 +78,14 @@
   .admin-manage-products__row {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .admin-manage-products__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .admin-manage-products__actions .form-select {
+    flex: 1 1 145px;
   }
 }

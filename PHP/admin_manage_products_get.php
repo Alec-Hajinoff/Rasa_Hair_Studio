@@ -55,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-
     $pdo = new PDO(
         'mysql:host=localhost;dbname=rasa_hair_studio',
         'root',
@@ -68,7 +67,7 @@ try {
     );
 
     $stmt = $pdo->query(
-        'SELECT id, name, description
+        'SELECT id, name, description, is_active
          FROM products
          ORDER BY id DESC'
     );
@@ -76,7 +75,9 @@ try {
     $products = $stmt->fetchAll();
 
     foreach ($products as &$product) {
-        $product['id'] = (int) $product['id'];
+
+        $product['id']        = (int) $product['id'];
+        $product['is_active'] = (int) $product['is_active'];
     }
     unset($product);
 

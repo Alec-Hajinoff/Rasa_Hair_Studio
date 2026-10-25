@@ -55,7 +55,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $requestData = json_decode(file_get_contents('php://input'), true);
-$productId   = filter_var($requestData['id'] ?? null, FILTER_VALIDATE_INT);
+
+if (! is_array($requestData)) {
+    http_response_code(400);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'A valid JSON request is required.',
+    ]);
+    exit;
+}
+
+$action = $requestData['action'] ?? 'delete';
+
+if (! in_array($action, ['delete', 'set_status'], true)) {
+    http_response_code(400);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'A valid product action is required.',
+    ]);
+    exit;
+}
+
+$productId = filter_var($requestData['id'] ?? null, FILTER_VALIDATE_INT);
 
 if ($productId === false || $productId === null || $productId <= 0) {
     http_response_code(400);
@@ -66,7 +87,76 @@ if ($productId === false || $productId === null || $productId <= 0) {
     exit;
 }
 
+if ($action === 'set_status') {
+    $isActive = $requestData['is_active'] ?? null;
+
+    if (! in_array($isActive, [0, 1, '0', '1'], true)) {
+        http_response_code(400);
+        echo json_encode([
+            'status'  => 'error',
+            'message' => 'A valid stock status is required.',
+        ]);
+        exit;
+    }
+
+    try {
+        $pdo = new PDO(
+            'mysql:host=localhost;dbname=rasa_hair_studio',
+            'root',
+            '',
+            [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ]
+        );
+
+        $update = $pdo->prepare(
+            'UPDATE products SET is_active = :is_active WHERE id = :id'
+        );
+        $update->bindValue(':is_active', (int) $isActive, PDO::PARAM_INT);
+        $update->bindValue(':id', $productId, PDO::PARAM_INT);
+        $update->execute();
+
+        if ($update->rowCount() === 0) {
+
+            $check = $pdo->prepare('SELECT id FROM products WHERE id = :id');
+            $check->bindValue(':id', $productId, PDO::PARAM_INT);
+            $check->execute();
+
+            if (! $check->fetch()) {
+                http_response_code(404);
+                echo json_encode([
+                    'status'  => 'error',
+                    'message' => 'Product not found.',
+                ]);
+                exit;
+            }
+        }
+
+        echo json_encode([
+            'status'    => 'success',
+            'message'   => ((int) $isActive === 1)
+                ? 'Product marked as in stock.'
+                : 'Product marked as out of stock.',
+            'is_active' => (int) $isActive,
+        ]);
+    } catch (Throwable $e) {
+        error_log('admin_manage_products_post.php status update: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'status'  => 'error',
+            'message' => 'The product stock status could not be updated.',
+        ]);
+    } finally {
+        $pdo = null;
+    }
+
+    exit;
+}
+
 $config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+
 if ($config === false || empty($config['UPLOAD_ROOT'])) {
     error_log('admin_manage_products_post.php: Failed to load UPLOAD_ROOT from .env');
     http_response_code(500);
@@ -87,7 +177,6 @@ $stagedPath           = null;
 $transactionCommitted = false;
 
 try {
-
     $pdo = new PDO(
         'mysql:host=localhost;dbname=rasa_hair_studio',
         'root',
@@ -148,7 +237,9 @@ try {
                 . '.deleting-' . bin2hex(random_bytes(16));
 
                 if (! rename($originalPath, $stagedPath)) {
-                    throw new RuntimeException('The product image could not be staged for deletion.');
+                    throw new RuntimeException(
+                        'The product image could not be staged for deletion.'
+                    );
                 }
             }
         }
@@ -162,8 +253,10 @@ try {
     $transactionCommitted = true;
 
     if ($stagedPath !== null && is_file($stagedPath) && ! unlink($stagedPath)) {
-
-        error_log('admin_manage_products_post.php: Could not remove staged image ' . $stagedPath);
+        error_log(
+            'admin_manage_products_post.php: Could not remove staged image '
+            . $stagedPath
+        );
     }
 
     echo json_encode([
