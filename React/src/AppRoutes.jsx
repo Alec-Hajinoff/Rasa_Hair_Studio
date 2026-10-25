@@ -9,24 +9,24 @@ import AdminDashboard from "./AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import UserLogin from "./UserLogin";
 import UserRegistration from "./UserRegistration";
-
+import Shop from "./Shop";
 import Blog from "./Blog";
 import Services from "./Services";
 import GalleryImages from "./GalleryImages";
 import AboutUs from "./AboutUs";
 
-export default function AppRoutes() {
+export default function AppRoutes({ isAuthenticated }) {
   return (
     <Routes>
       <Route path="/" element={<MainRegLog />} />
-
       <Route path="/Services" element={<Services />} />
-
       <Route path="/Gallery" element={<GalleryImages />} />
-
       <Route path="/AboutUs" element={<AboutUs />} />
-
       <Route path="/Blog" element={<Blog />} />
+      <Route
+        path="/Shop"
+        element={<Shop isAuthenticated={isAuthenticated} />}
+      />
       <Route path="/UserLogin" element={<UserLogin />} />
       <Route path="/UserRegistration" element={<UserRegistration />} />
       <Route path="/RegisteredPage" element={<RegisteredPage />} />

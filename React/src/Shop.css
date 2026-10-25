@@ -1,0 +1,14 @@
+.shop-page {
+  padding: 1rem 0;
+}
+
+.shop-placeholder {
+  margin-top: 1.5rem;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.shop-auth-status {
+  margin-top: 1rem;
+}
