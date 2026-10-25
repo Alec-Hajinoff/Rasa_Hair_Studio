@@ -114,6 +114,7 @@ function AdminCreateProduct({ onProductSaved }) {
 
       setError("");
       setMessage(result.message || "Product saved successfully.");
+      onProductSaved?.();
     } catch (saveError) {
       setError(saveError.message || "The product could not be saved.");
     } finally {
