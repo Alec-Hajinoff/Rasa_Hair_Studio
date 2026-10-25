@@ -1,5 +1,6 @@
 .admin-manage-products {
   margin-top: 1.5rem;
+  max-width: 720px;
   padding: 1.25rem;
   border: 1px solid #dee2e6;
   border-radius: 0.5rem;
