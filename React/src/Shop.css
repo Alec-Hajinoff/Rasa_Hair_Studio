@@ -2,13 +2,11 @@
   padding: 1rem 0;
 }
 
-.shop-placeholder {
-  margin-top: 1.5rem;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+.shop-product-image {
+  height: 240px;
+  object-fit: cover;
 }
 
-.shop-auth-status {
-  margin-top: 1rem;
+.shop-product-card {
+  border-color: #ddd;
 }
