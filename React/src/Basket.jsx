@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useBasket } from "./BasketContext";
+import { shopCreateCheckoutSession } from "./ApiService";
 import "./Basket.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -8,6 +9,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function Basket() {
   const { items, subtotal, updateQuantity, removeItem, clearBasket } =
     useBasket();
+
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   function getImageUrl(imagePath) {
     if (!imagePath) {
@@ -18,6 +22,23 @@ function Basket() {
       return new URL(imagePath, API_BASE_URL).toString();
     } catch {
       return imagePath;
+    }
+  }
+
+  async function handleCheckout() {
+    if (items.length === 0 || isCheckingOut) {
+      return;
+    }
+
+    setIsCheckingOut(true);
+    setCheckoutError("");
+
+    try {
+      const session = await shopCreateCheckoutSession(items);
+      window.location.assign(session.url);
+    } catch (error) {
+      setCheckoutError(error.message || "Checkout could not be started.");
+      setIsCheckingOut(false);
     }
   }
 
@@ -34,6 +55,12 @@ function Basket() {
         </div>
       ) : (
         <>
+          {checkoutError && (
+            <div className="alert alert-danger" role="alert">
+              {checkoutError}
+            </div>
+          )}
+
           <div className="list-group mb-4">
             {items.map((item) => {
               const imageUrl = getImageUrl(item.image_path);
@@ -61,6 +88,7 @@ function Basket() {
                         type="button"
                         className="btn btn-sm btn-outline-secondary"
                         aria-label={`Decrease ${item.name} quantity`}
+                        disabled={isCheckingOut}
                         onClick={() =>
                           updateQuantity(item.id, item.quantity - 1)
                         }
@@ -74,6 +102,7 @@ function Basket() {
                         type="button"
                         className="btn btn-sm btn-outline-secondary"
                         aria-label={`Increase ${item.name} quantity`}
+                        disabled={isCheckingOut}
                         onClick={() =>
                           updateQuantity(item.id, item.quantity + 1)
                         }
@@ -84,6 +113,7 @@ function Basket() {
                       <button
                         type="button"
                         className="btn btn-sm btn-link"
+                        disabled={isCheckingOut}
                         onClick={() => removeItem(item.id)}
                       >
                         Remove
@@ -105,13 +135,19 @@ function Basket() {
             <button
               type="button"
               className="btn btn-outline-danger"
+              disabled={isCheckingOut}
               onClick={clearBasket}
             >
               Clear basket
             </button>
 
-            <button type="button" className="btn btn-primary" disabled>
-              Checkout
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={isCheckingOut || items.length === 0}
+              onClick={handleCheckout}
+            >
+              {isCheckingOut ? "Connecting to Stripe..." : "Checkout"}
             </button>
           </div>
         </>

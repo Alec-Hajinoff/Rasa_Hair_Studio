@@ -696,3 +696,39 @@ export const shopGetProducts = async () => {
     );
   }
 };
+
+// shopCreateCheckoutSession() initiates a Stripe Checkout Session for the items in the user's basket and returns the session URL.
+
+export const shopCreateCheckoutSession = async (items) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/shop_create_checkout_session.php`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+          })),
+        }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success" || !data.url) {
+      throw new Error(data.message || "Checkout could not be started.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error creating Stripe Checkout Session:", error);
+    throw new Error(
+      error.message || "An error occurred while starting checkout.",
+    );
+  }
+};
