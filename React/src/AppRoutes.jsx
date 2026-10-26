@@ -11,6 +11,7 @@ import UserLogin from "./UserLogin";
 import UserRegistration from "./UserRegistration";
 import Shop from "./Shop";
 import Basket from "./Basket";
+import OrderSuccess from "./OrderSuccess";
 import Blog from "./Blog";
 import Services from "./Services";
 import GalleryImages from "./GalleryImages";
@@ -31,6 +32,8 @@ export default function AppRoutes({ isAuthenticated }) {
       />
 
       <Route path="/Basket" element={<Basket />} />
+
+      <Route path="/OrderSuccess" element={<OrderSuccess />} />
 
       <Route path="/UserLogin" element={<UserLogin />} />
       <Route path="/UserRegistration" element={<UserRegistration />} />

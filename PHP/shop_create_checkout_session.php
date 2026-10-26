@@ -94,7 +94,11 @@ if (! filter_var($ngrokDomain, FILTER_VALIDATE_URL)) {
 $input          = json_decode(file_get_contents('php://input'), true);
 $requestedItems = $input['items'] ?? null;
 
-if (! is_array($requestedItems) || count($requestedItems) < 1 || count($requestedItems) > 100) {
+if (
+    ! is_array($requestedItems) ||
+    count($requestedItems) < 1 ||
+    count($requestedItems) > 100
+) {
     http_response_code(400);
     echo json_encode([
         'status'  => 'error',
@@ -139,7 +143,6 @@ foreach ($requestedItems as $item) {
 }
 
 try {
-
     $pdo = new PDO(
         'mysql:host=localhost;dbname=rasa_hair_studio',
         'root',
@@ -199,8 +202,15 @@ try {
 
     $checkoutData = [
         'mode'                        => 'payment',
-        'success_url'                 => $ngrokDomain . '/Rasa_Hair_Studio/PHP/success_redirect.php',
-        'cancel_url'                  => $ngrokDomain . '/Rasa_Hair_Studio/PHP/cancel_redirect.php',
+
+        'success_url'                 =>
+        $ngrokDomain .
+        '/Rasa_Hair_Studio/PHP/success_redirect.php?session_id={CHECKOUT_SESSION_ID}',
+
+        'cancel_url'                  =>
+        $ngrokDomain .
+        '/Rasa_Hair_Studio/PHP/cancel_redirect.php',
+
         'shipping_address_collection' => [
             'allowed_countries' => ['GB'],
         ],
@@ -237,7 +247,11 @@ try {
 
     $stripeData = json_decode($stripeResponse, true);
 
-    if ($stripeHttpCode < 200 || $stripeHttpCode >= 300 || empty($stripeData['url'])) {
+    if (
+        $stripeHttpCode < 200 ||
+        $stripeHttpCode >= 300 ||
+        empty($stripeData['url'])
+    ) {
         error_log(
             'shop_create_checkout_session.php: Stripe API error: ' .
             ($stripeData['error']['message'] ?? 'Unknown Stripe error.')
@@ -245,7 +259,9 @@ try {
         http_response_code(502);
         echo json_encode([
             'status'  => 'error',
-            'message' => $stripeData['error']['message'] ?? 'Stripe could not start checkout.',
+            'message' =>
+            $stripeData['error']['message'] ??
+            'Stripe could not start checkout.',
         ]);
         exit;
     }
@@ -256,7 +272,6 @@ try {
         'session_id' => $stripeData['id'],
     ]);
 } catch (Throwable $e) {
-
     error_log('shop_create_checkout_session.php: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
