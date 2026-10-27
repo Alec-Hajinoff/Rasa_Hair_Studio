@@ -732,3 +732,37 @@ export const shopCreateCheckoutSession = async (items) => {
     );
   }
 };
+
+// deliveryChargeGet() reads the current delivery fee from the PHP endpoint.
+
+export const deliveryChargeGet = async () => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/delivery_charge_get.php`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await response.json();
+
+    if (
+      !response.ok ||
+      data.success !== true ||
+      !Number.isSafeInteger(data.delivery_charge_pence) ||
+      data.delivery_charge_pence < 0
+    ) {
+      throw new Error(
+        data.message || "The delivery charge could not be loaded.",
+      );
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching delivery charge:", error);
+    throw new Error(
+      error.message || "An error occurred while loading the delivery charge.",
+    );
+  }
+};
