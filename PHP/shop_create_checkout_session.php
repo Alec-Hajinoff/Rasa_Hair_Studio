@@ -36,6 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+require_once __DIR__ . '/session_config.php';
+
+$checkoutUserId = isset($_SESSION['id'])
+    ? (string) $_SESSION['id']
+    : null;
+
 $envPath = __DIR__ . '/../.env';
 
 if (! is_file($envPath) || ! is_readable($envPath)) {
@@ -202,20 +208,23 @@ try {
 
     $checkoutData = [
         'mode'                        => 'payment',
-
         'success_url'                 =>
         $ngrokDomain .
         '/Rasa_Hair_Studio/PHP/success_redirect.php?session_id={CHECKOUT_SESSION_ID}',
-
         'cancel_url'                  =>
         $ngrokDomain .
         '/Rasa_Hair_Studio/PHP/cancel_redirect.php',
-
         'shipping_address_collection' => [
             'allowed_countries' => ['GB'],
         ],
         'line_items'                  => $lineItems,
     ];
+
+    if ($checkoutUserId !== null && $checkoutUserId !== '') {
+        $checkoutData['metadata'] = [
+            'user_id' => $checkoutUserId,
+        ];
+    }
 
     $curl = curl_init('https://api.stripe.com/v1/checkout/sessions');
     curl_setopt_array($curl, [
