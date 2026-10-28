@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./UserDashboard.css";
-
+import CustomerShopOrders from "./CustomerShopOrders";
 import CustomerProfile from "./CustomerProfile";
 import CustomerDeleteAccount from "./CustomerDeleteAccount";
 
@@ -46,7 +46,7 @@ function UserDashboard() {
 
           {activeTab === "shop-orders" && (
             <div className="tab-pane-content">
-              <p>Your shop order history will appear here.</p>
+              <CustomerShopOrders />
             </div>
           )}
 

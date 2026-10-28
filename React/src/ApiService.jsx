@@ -794,3 +794,30 @@ export const adminShopOrders = async () => {
     );
   }
 };
+
+// customerShopOrders() fetches customer's shop orders and their items for the user dashboard.
+
+export const customerShopOrders = async () => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Rasa_Hair_Studio/PHP/customer_shop_orders.php`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw new Error(data.message || "Shop orders could not be loaded.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching customer shop orders:", error);
+    throw new Error(
+      error.message || "An error occurred while loading your shop orders.",
+    );
+  }
+};
