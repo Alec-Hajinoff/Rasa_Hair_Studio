@@ -17,6 +17,8 @@ import Services from "./Services";
 import GalleryImages from "./GalleryImages";
 import AboutUs from "./AboutUs";
 
+import ProductDetails from "./ProductDetails";
+
 export default function AppRoutes({ isAuthenticated }) {
   return (
     <Routes>
@@ -30,6 +32,8 @@ export default function AppRoutes({ isAuthenticated }) {
         path="/Shop"
         element={<Shop isAuthenticated={isAuthenticated} />}
       />
+
+      <Route path="/Shop/:productId" element={<ProductDetails />} />
 
       <Route path="/Basket" element={<Basket />} />
 

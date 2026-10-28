@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { shopGetProducts } from "./ApiService";
 import { useBasket } from "./BasketContext";
+
+import { Link } from "react-router-dom";
 import "./Shop.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -87,15 +89,27 @@ function Shop() {
                 <div className="col-12 col-sm-6 col-lg-4" key={product.id}>
                   <article className="card h-100 shop-product-card">
                     {imageUrl && (
-                      <img
-                        src={imageUrl}
-                        className="card-img-top shop-product-image"
-                        alt={product.name}
-                      />
+                      <Link
+                        to={`/Shop/${product.id}`}
+                        aria-label={`View details for ${product.name}`}
+                      >
+                        <img
+                          src={imageUrl}
+                          className="card-img-top shop-product-image"
+                          alt={product.name}
+                        />
+                      </Link>
                     )}
 
                     <div className="card-body">
-                      <h2 className="card-title h5">{product.name}</h2>
+                      <h2 className="card-title h5">
+                        <Link
+                          to={`/Shop/${product.id}`}
+                          className="shop-product-details-link"
+                        >
+                          {product.name}
+                        </Link>
+                      </h2>
 
                       <p className="card-text fw-bold">
                         £{Number(product.price_gbp).toFixed(2)}
