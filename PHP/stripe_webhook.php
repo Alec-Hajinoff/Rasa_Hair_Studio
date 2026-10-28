@@ -295,6 +295,19 @@ if (
     ]);
 }
 
+$shippingCost   = $session['shipping_cost'] ?? [];
+$shippingAmount = is_array($shippingCost)
+    ? ($shippingCost['amount_total'] ?? 0)
+    : 0;
+
+if (! is_int($shippingAmount) || $shippingAmount < 0) {
+    error_log('stripe_webhook.php: Checkout Session shipping amount is invalid.');
+    webhookRespond(400, [
+        'status'  => 'error',
+        'message' => 'Checkout Session shipping amount is invalid.',
+    ]);
+}
+
 $shippingDetails =
 $session['collected_information']['shipping_details'] ?? $session['shipping_details'] ?? [];
 
@@ -362,7 +375,6 @@ if (
 }
 
 try {
-
     $pdo = new PDO(
         'mysql:host=localhost;dbname=rasa_hair_studio;charset=utf8mb4',
         'root',
@@ -379,7 +391,6 @@ try {
         $userCheck->execute([$userId]);
 
         if (! $userCheck->fetch()) {
-
             $userId = null;
         }
     }
@@ -431,7 +442,6 @@ try {
             'product_id'   => $productId,
             'product_name' => webhookLimitText((string) $productName, 255) ?? 'Product',
             'quantity'     => $quantity,
-
             'unit_amount'  => $unitAmount,
             'total_amount' => $totalAmount,
         ];
@@ -444,6 +454,7 @@ try {
             user_id,
             stripe_session_id,
             amount_total,
+            shipping_amount,
             currency,
             payment_status,
             recipient_name,
@@ -458,6 +469,7 @@ try {
             :user_id,
             :stripe_session_id,
             :amount_total,
+            :shipping_amount,
             :currency,
             :payment_status,
             :recipient_name,
@@ -475,6 +487,7 @@ try {
         ':user_id'           => $userId,
         ':stripe_session_id' => $sessionId,
         ':amount_total'      => $amountTotal,
+        ':shipping_amount'   => $shippingAmount,
         ':currency'          => strtoupper($currency),
         ':payment_status'    => $paymentStatus,
         ':recipient_name'    => $recipientName,
@@ -532,7 +545,6 @@ try {
                 $productExists->execute([$productId]);
 
                 if (! $productExists->fetch()) {
-
                     $productId = null;
                 }
             }
@@ -548,17 +560,19 @@ try {
         }
     } else {
 
-        $updatePaymentStatus = $pdo->prepare(
+        $updateTransaction = $pdo->prepare(
             "UPDATE transactions
-             SET payment_status = CASE
-                 WHEN payment_status = 'paid' THEN 'paid'
-                 ELSE :payment_status
-             END
+             SET shipping_amount = :shipping_amount,
+                 payment_status = CASE
+                     WHEN payment_status = 'paid' THEN 'paid'
+                     ELSE :payment_status
+                 END
              WHERE id = :id"
         );
-        $updatePaymentStatus->execute([
-            ':payment_status' => $paymentStatus,
-            ':id'             => $transactionId,
+        $updateTransaction->execute([
+            ':shipping_amount' => $shippingAmount,
+            ':payment_status'  => $paymentStatus,
+            ':id'              => $transactionId,
         ]);
     }
 
