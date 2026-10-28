@@ -107,7 +107,10 @@ function Basket() {
     setCheckoutError("");
 
     try {
-      const session = await shopCreateCheckoutSession(items);
+      const session = await shopCreateCheckoutSession(
+        items,
+        deliveryChargePence,
+      );
       window.location.assign(session.url);
     } catch (error) {
       setCheckoutError(error.message || "Checkout could not be started.");

@@ -97,8 +97,62 @@ if (! filter_var($ngrokDomain, FILTER_VALIDATE_URL)) {
     exit;
 }
 
-$input          = json_decode(file_get_contents('php://input'), true);
-$requestedItems = $input['items'] ?? null;
+$deliveryChargeGbp = trim(
+    (string) ($_ENV['DELIVERY_CHARGE_GBP'] ?? getenv('DELIVERY_CHARGE_GBP') ?: '')
+);
+
+if (! preg_match('/^\d+(?:\.\d{1,2})?$/', $deliveryChargeGbp)) {
+    error_log('shop_create_checkout_session.php: DELIVERY_CHARGE_GBP is missing or invalid.');
+    http_response_code(500);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Delivery charge configuration is invalid.',
+    ]);
+    exit;
+}
+
+$deliveryParts     = explode('.', $deliveryChargeGbp, 2);
+$deliveryPounds    = (int) $deliveryParts[0];
+$deliveryPenceText = str_pad($deliveryParts[1] ?? '', 2, '0');
+$deliveryPence     = (int) substr($deliveryPenceText, 0, 2);
+
+if ($deliveryPounds > intdiv(PHP_INT_MAX - 99, 100)) {
+    error_log('shop_create_checkout_session.php: DELIVERY_CHARGE_GBP is too large.');
+    http_response_code(500);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Delivery charge configuration is invalid.',
+    ]);
+    exit;
+}
+
+$deliveryChargePence = ($deliveryPounds * 100) + $deliveryPence;
+
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (! is_array($input)) {
+    http_response_code(400);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Invalid checkout request.',
+    ]);
+    exit;
+}
+
+$requestedItems               = $input['items'] ?? null;
+$requestedDeliveryChargePence = $input['delivery_charge_pence'] ?? null;
+
+if (
+    filter_var($requestedDeliveryChargePence, FILTER_VALIDATE_INT) === false ||
+    (int) $requestedDeliveryChargePence !== $deliveryChargePence
+) {
+    http_response_code(409);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'The delivery charge has changed. Please reload your basket and try again.',
+    ]);
+    exit;
+}
 
 if (
     ! is_array($requestedItems) ||
@@ -217,6 +271,18 @@ try {
         'shipping_address_collection' => [
             'allowed_countries' => ['GB'],
         ],
+
+        'shipping_options'            => [[
+            'shipping_rate_data' => [
+                'type'         => 'fixed_amount',
+                'display_name' => 'Standard delivery',
+                'fixed_amount' => [
+                    'amount'   => $deliveryChargePence,
+                    'currency' => 'gbp',
+                ],
+            ],
+        ]],
+
         'line_items'                  => $lineItems,
     ];
 

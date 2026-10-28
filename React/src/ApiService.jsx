@@ -699,7 +699,7 @@ export const shopGetProducts = async () => {
 
 // shopCreateCheckoutSession() initiates a Stripe Checkout Session for the items in the user's basket and returns the session URL.
 
-export const shopCreateCheckoutSession = async (items) => {
+export const shopCreateCheckoutSession = async (items, deliveryChargePence) => {
   try {
     const response = await fetch(
       `${API_BASE_URL}/Rasa_Hair_Studio/PHP/shop_create_checkout_session.php`,
@@ -714,6 +714,7 @@ export const shopCreateCheckoutSession = async (items) => {
             id: item.id,
             quantity: item.quantity,
           })),
+          delivery_charge_pence: deliveryChargePence,
         }),
       },
     );
