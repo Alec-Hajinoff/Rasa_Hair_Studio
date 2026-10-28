@@ -1,0 +1,102 @@
+.admin-shop-orders {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-shop-orders__message {
+  color: #555;
+  margin: 0;
+}
+
+.admin-shop-orders__card {
+  background: #fff;
+  border: 1px solid #dedede;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.admin-shop-orders__header {
+  align-items: flex-start;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.admin-shop-orders__title {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.admin-shop-orders__subtext {
+  color: #666;
+  margin: 0.25rem 0 0;
+}
+
+.admin-shop-orders__status {
+  background: #eee;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.7rem;
+  text-transform: capitalize;
+}
+
+.admin-shop-orders__status--paid {
+  background: #e4f4e8;
+  color: #17652b;
+}
+
+.admin-shop-orders__status--unpaid {
+  background: #fff1d6;
+  color: #765000;
+}
+
+.admin-shop-orders__details {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  padding: 1rem;
+}
+
+.admin-shop-orders__details > div {
+  display: grid;
+  gap: 0.2rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-shop-orders__details strong {
+  font-size: 0.85rem;
+}
+
+.admin-shop-orders__items-wrap {
+  overflow-x: auto;
+  padding: 0 1rem 1rem;
+}
+
+.admin-shop-orders__items {
+  border-collapse: collapse;
+  min-width: 520px;
+  width: 100%;
+}
+
+.admin-shop-orders__items th,
+.admin-shop-orders__items td {
+  border-top: 1px solid #e8e8e8;
+  padding: 0.65rem;
+  text-align: left;
+}
+
+.admin-shop-orders__items th {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 576px) {
+  .admin-shop-orders__header {
+    align-items: flex-start;
+  }
+
+  .admin-shop-orders__details {
+    grid-template-columns: 1fr;
+  }
+}
