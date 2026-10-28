@@ -1,7 +1,7 @@
 import React from "react";
 import HeroSection from "./HeroSection";
 import ServicesSection from "./ServicesSection";
-
+import FeaturedProductsCarousel from "./FeaturedProductsCarousel";
 import WhyChooseUs from "./WhyChooseUs";
 import TestimonialCarousel from "./TestimonialCarousel";
 
@@ -23,7 +23,7 @@ function MainComponent({ isAuthenticated, userRole, isLoading }) {
           <div className="col-12 col-md-11 col-lg-10 mx-auto">
             <div className="main-container">
               <ServicesSection />
-
+              <FeaturedProductsCarousel />
               <div>
                 <WhyChooseUs />
               </div>
