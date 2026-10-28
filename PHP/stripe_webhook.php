@@ -2,6 +2,8 @@
 
 header('Content-Type: application/json; charset=UTF-8');
 
+require_once __DIR__ . '/shop_order_email_notifications.php';
+
 function webhookRespond(int $statusCode, array $body): void
 {
     http_response_code($statusCode);
@@ -503,7 +505,7 @@ try {
     $isNewTransaction = $insertTransaction->rowCount() === 1;
 
     $findTransaction = $pdo->prepare(
-        'SELECT id, payment_status
+        'SELECT id
          FROM transactions
          WHERE stripe_session_id = ?
          FOR UPDATE'
@@ -577,6 +579,10 @@ try {
     }
 
     $pdo->commit();
+
+    if ($paymentStatus === 'paid') {
+        sendShopOrderEmailNotifications($pdo, $transactionId, $config);
+    }
 
     webhookRespond(200, [
         'status'            => 'success',
