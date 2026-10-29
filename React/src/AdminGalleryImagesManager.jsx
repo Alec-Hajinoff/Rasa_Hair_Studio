@@ -11,8 +11,7 @@ function AdminGalleryImagesManager({ refreshKey }) {
   const [error, setError] = useState(null);
 
   const [selectedImage, setSelectedImage] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [modalFeedback, setModalFeedback] = useState(null);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -44,61 +43,13 @@ function AdminGalleryImagesManager({ refreshKey }) {
 
   const handleOpenModal = (image) => {
     setSelectedImage(image);
-    setEditTitle(image.title || "");
     setModalFeedback(null);
   };
 
   const handleCloseModal = () => {
-    if (isSaving) return;
+    if (isDeleting) return;
     setSelectedImage(null);
     setModalFeedback(null);
-  };
-
-  const handleSave = async () => {
-    if (!editTitle.trim()) {
-      setModalFeedback({ type: "danger", text: "Title cannot be empty." });
-      return;
-    }
-
-    setIsSaving(true);
-    setModalFeedback(null);
-
-    try {
-      const response = await adminGalleryImagesManagerPost({
-        action: "update",
-        id: selectedImage.id,
-        title: editTitle.trim(),
-      });
-
-      if (response.status === "success") {
-        setModalFeedback({ type: "success", text: response.message });
-
-        setImages((previousImages) =>
-          previousImages.map((image) =>
-            image.id === selectedImage.id
-              ? { ...image, title: editTitle.trim() }
-              : image,
-          ),
-        );
-
-        setTimeout(() => {
-          setSelectedImage(null);
-          setModalFeedback(null);
-        }, 1200);
-      } else {
-        setModalFeedback({
-          type: "danger",
-          text: response.message || "Failed to update the image.",
-        });
-      }
-    } catch (err) {
-      setModalFeedback({
-        type: "danger",
-        text: err.message || "An error occurred while updating the image.",
-      });
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const handleDelete = async () => {
@@ -110,7 +61,7 @@ function AdminGalleryImagesManager({ refreshKey }) {
 
     if (!confirmed) return;
 
-    setIsSaving(true);
+    setIsDeleting(true);
     setModalFeedback(null);
 
     try {
@@ -141,7 +92,7 @@ function AdminGalleryImagesManager({ refreshKey }) {
         text: err.message || "An error occurred while deleting the image.",
       });
     } finally {
-      setIsSaving(false);
+      setIsDeleting(false);
     }
   };
 
@@ -167,7 +118,7 @@ function AdminGalleryImagesManager({ refreshKey }) {
               type="button"
               className="gallery-card"
               onClick={() => handleOpenModal(image)}
-              aria-label={`Edit ${image.title}`}
+              aria-label={`View delete option for ${image.title}`}
             >
               <img
                 src={`${API_BASE_URL}${image.image_path}`}
@@ -200,14 +151,14 @@ function AdminGalleryImagesManager({ refreshKey }) {
               <div className="modal-content">
                 <div className="modal-header">
                   <h5 className="modal-title" id="gallery-modal-title">
-                    Edit Image
+                    Gallery Image
                   </h5>
                   <button
                     type="button"
                     className="btn-close"
                     aria-label="Close"
                     onClick={handleCloseModal}
-                    disabled={isSaving}
+                    disabled={isDeleting}
                   />
                 </div>
 
@@ -222,22 +173,9 @@ function AdminGalleryImagesManager({ refreshKey }) {
                     </div>
 
                     <div className="col-md-5">
-                      <div className="mb-3">
-                        <label
-                          className="form-label"
-                          htmlFor="gallery-image-title"
-                        >
-                          Title
-                        </label>
-                        <input
-                          id="gallery-image-title"
-                          type="text"
-                          className="form-control"
-                          value={editTitle}
-                          onChange={(event) => setEditTitle(event.target.value)}
-                          disabled={isSaving}
-                        />
-                      </div>
+                      <p className="mb-3">
+                        <strong>Title:</strong> {selectedImage.title}
+                      </p>
 
                       {modalFeedback && (
                         <div
@@ -256,25 +194,18 @@ function AdminGalleryImagesManager({ refreshKey }) {
                     type="button"
                     className="btn btn-secondary"
                     onClick={handleCloseModal}
-                    disabled={isSaving}
+                    disabled={isDeleting}
                   >
                     Close
                   </button>
+
                   <button
                     type="button"
                     className="btn btn-danger me-auto"
                     onClick={handleDelete}
-                    disabled={isSaving}
+                    disabled={isDeleting}
                   >
-                    {isSaving ? "Please wait..." : "Delete Image"}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleSave}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save Title"}
+                    {isDeleting ? "Deleting..." : "Delete Image"}
                   </button>
                 </div>
               </div>

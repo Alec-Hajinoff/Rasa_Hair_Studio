@@ -55,7 +55,7 @@ if (! is_array($input)) {
 
 $action = $input['action'] ?? '';
 
-if (! in_array($action, ['update', 'delete'], true)) {
+if ($action !== 'delete') {
     echo json_encode(['status' => 'error', 'message' => 'Invalid image action.']);
     exit;
 }
@@ -71,27 +71,6 @@ if (
 
 $id = (int) $input['id'];
 
-$title = null;
-
-if ($action === 'update') {
-    if (! isset($input['title']) || ! is_string($input['title'])) {
-        echo json_encode(['status' => 'error', 'message' => 'Image title is required.']);
-        exit;
-    }
-
-    $title = trim($input['title']);
-
-    if ($title === '') {
-        echo json_encode(['status' => 'error', 'message' => 'Title cannot be empty.']);
-        exit;
-    }
-
-    if (strlen($title) > 255) {
-        echo json_encode(['status' => 'error', 'message' => 'Title must not exceed 255 characters.']);
-        exit;
-    }
-}
-
 $pdo = null;
 
 try {
@@ -100,30 +79,6 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
-
-    if ($action === 'update') {
-
-        $check = $pdo->prepare('SELECT id FROM gallery_images WHERE id = :id');
-        $check->execute([':id' => $id]);
-
-        if (! $check->fetch()) {
-            echo json_encode(['status' => 'error', 'message' => 'Image not found.']);
-            exit;
-        }
-
-        $stmt = $pdo->prepare(
-            'UPDATE gallery_images
-             SET title = :title, updated_at = NOW()
-             WHERE id = :id'
-        );
-        $stmt->execute([
-            ':title' => $title,
-            ':id'    => $id,
-        ]);
-
-        echo json_encode(['status' => 'success', 'message' => 'Image title updated successfully.']);
-        exit;
-    }
 
     $pdo->beginTransaction();
 
@@ -180,7 +135,6 @@ try {
     }
 
     if (! $fileCleanupSucceeded) {
-
         file_put_contents(
             'error_log.txt',
             'Could not remove unreferenced gallery image file: ' . $imagePath . PHP_EOL,
@@ -194,7 +148,6 @@ try {
         'file_cleanup' => $fileCleanupSucceeded ? 'complete' : 'failed',
     ]);
 } catch (PDOException $e) {
-
     if ($pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
