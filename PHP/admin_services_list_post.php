@@ -55,7 +55,7 @@ if (! is_array($input)) {
 
 $action = $input['action'] ?? '';
 
-if (! in_array($action, ['update', 'delete'], true)) {
+if ($action !== 'delete') {
     echo json_encode(['status' => 'error', 'message' => 'Invalid service action.']);
     exit;
 }
@@ -75,99 +75,20 @@ try {
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
 
-    if ($action === 'delete') {
-        $delete = $pdo->prepare('DELETE FROM services WHERE id = :id');
-        $delete->execute([':id' => $id]);
+    $delete = $pdo->prepare('DELETE FROM services WHERE id = :id');
+    $delete->execute([':id' => $id]);
 
-        if ($delete->rowCount() === 0) {
-            echo json_encode(['status' => 'error', 'message' => 'Service not found.']);
-            exit;
-        }
-
-        echo json_encode(['status' => 'success', 'message' => 'Service deleted successfully.']);
-        exit;
-    }
-
-    $title       = trim($input['title'] ?? '');
-    $description = trim($input['description'] ?? '');
-    $price_type  = trim($input['price_type'] ?? '');
-
-    if ($title === '') {
-        echo json_encode(['status' => 'error', 'message' => 'Service title is required.']);
-        exit;
-    }
-
-    if (strlen($title) > 255) {
-        echo json_encode(['status' => 'error', 'message' => 'Service title must not exceed 255 characters.']);
-        exit;
-    }
-
-    if ($description === '') {
-        echo json_encode(['status' => 'error', 'message' => 'Service description is required.']);
-        exit;
-    }
-
-    if (! in_array($price_type, ['fixed', 'from', 'consultation'], true)) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid price type.']);
-        exit;
-    }
-
-    $price = null;
-
-    if ($price_type === 'fixed' || $price_type === 'from') {
-        if (! isset($input['price']) || $input['price'] === '' || $input['price'] === null) {
-            echo json_encode([
-                'status'  => 'error',
-                'message' => 'A valid price is required for fixed or from price types.',
-            ]);
-            exit;
-        }
-
-        if (! is_numeric($input['price']) || (float) $input['price'] < 0) {
-            echo json_encode([
-                'status'  => 'error',
-                'message' => 'Price must be a non-negative number.',
-            ]);
-            exit;
-        }
-
-        $price = (float) $input['price'];
-    }
-
-    $check = $pdo->prepare('SELECT id FROM services WHERE id = :id');
-    $check->execute([':id' => $id]);
-
-    if (! $check->fetch()) {
+    if ($delete->rowCount() === 0) {
         echo json_encode(['status' => 'error', 'message' => 'Service not found.']);
         exit;
     }
 
-    $sql = 'UPDATE services
-            SET title = :title,
-                description = :description,
-                price_type = :price_type,
-                price = :price,
-                updated_at = NOW()
-            WHERE id = :id';
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':title'       => $title,
-        ':description' => $description,
-        ':price_type'  => $price_type,
-        ':price'       => $price,
-        ':id'          => $id,
-    ]);
-
-    echo json_encode(['status' => 'success', 'message' => 'Service updated successfully.']);
+    echo json_encode(['status' => 'success', 'message' => 'Service deleted successfully.']);
 } catch (PDOException $e) {
-
     file_put_contents('error_log.txt', $e->getMessage() . PHP_EOL, FILE_APPEND);
     echo json_encode([
         'status'  => 'error',
-        'message' => $action === 'delete'
-            ? 'Failed to delete the service.'
-            : 'Failed to update the service.',
+        'message' => 'Failed to delete the service.',
     ]);
 } finally {
     $pdo = null;
