@@ -1,6 +1,13 @@
 <?php
 require_once 'session_config.php';
 
+$config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+if ($config === false) {
+    error_log('login_capture.php: Failed to parse .env file');
+    echo json_encode(['status' => 'error', 'message' => 'Server configuration error']);
+    exit;
+}
+
 $allowed_origins = [
     'http://localhost:5173',
 ];
@@ -25,6 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
+$dbHost     = $config['DB_HOST'] ?? '';
+$dbName     = $config['DB_NAME'] ?? '';
+$dbUser     = $config['DB_USER'] ?? '';
+$dbPassword = $config['DB_PASSWORD'] ?? '';
+
+if ($dbHost === '' || $dbName === '' || $dbUser === '') {
+    error_log('login_capture.php: Database settings are missing from .env');
+    echo json_encode(['status' => 'error', 'message' => 'Server configuration error']);
+    exit;
+}
+
 if (isset($input['email'], $input['password'])) {
     $email = filter_var(trim($input['email']), FILTER_SANITIZE_EMAIL);
     if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -33,11 +51,13 @@ if (isset($input['email'], $input['password'])) {
     }
     $password = $input['password'];
     try {
-        $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ]);
+        $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName",
+            $dbUser,
+            $dbPassword, [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ]);
 
         $pdo->beginTransaction();
 
