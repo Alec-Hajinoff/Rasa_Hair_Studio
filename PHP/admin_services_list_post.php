@@ -1,4 +1,5 @@
 <?php
+
 require_once 'session_config.php';
 
 $allowed_origins = [
@@ -24,13 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Invalid request method.',
+    ]);
     exit;
 }
 
 if (! isset($_SESSION['id'])) {
     echo json_encode([
-        'status'  => 'unauthorized',
+        'status'  => 'unauthorised',
         'message' => 'Unauthorized access. Please log in.',
     ]);
     exit;
@@ -49,47 +53,122 @@ if (strtolower($user_role) !== 'admin') {
 $input = json_decode(file_get_contents('php://input'), true);
 
 if (! is_array($input)) {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid JSON request.']);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Invalid JSON request.',
+    ]);
     exit;
 }
 
 $action = $input['action'] ?? '';
 
 if ($action !== 'delete') {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid service action.']);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Invalid service action.',
+    ]);
     exit;
 }
 
-if (! isset($input['id']) || ! filter_var($input['id'], FILTER_VALIDATE_INT) || (int) $input['id'] < 1) {
-    echo json_encode(['status' => 'error', 'message' => 'A valid service ID is required.']);
+if (
+    ! isset($input['id']) ||
+    ! filter_var($input['id'], FILTER_VALIDATE_INT) ||
+    (int) $input['id'] < 1
+) {
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'A valid service ID is required.',
+    ]);
     exit;
 }
 
-$id  = (int) $input['id'];
+$id = (int) $input['id'];
+
+$config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+
+if ($config === false) {
+    error_log('admin_services_list_post.php: Failed to parse .env file');
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
+    ]);
+
+    exit;
+}
+
+$dbHost     = $config['DB_HOST'] ?? '';
+$dbName     = $config['DB_NAME'] ?? '';
+$dbUser     = $config['DB_USER'] ?? '';
+$dbPassword = $config['DB_PASSWORD'] ?? '';
+
+if (
+    $dbHost === '' ||
+    $dbName === '' ||
+    $dbUser === ''
+) {
+    error_log('admin_services_list_post.php: Database settings are missing from .env');
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
+    ]);
+
+    exit;
+}
+
 $pdo = null;
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
+
+    $pdo = new PDO(
+        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
+        $dbUser,
+        $dbPassword,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]
+    );
+
+    $delete = $pdo->prepare(
+        'DELETE FROM services WHERE id = :id'
+    );
+
+    $delete->execute([
+        ':id' => $id,
     ]);
 
-    $delete = $pdo->prepare('DELETE FROM services WHERE id = :id');
-    $delete->execute([':id' => $id]);
-
     if ($delete->rowCount() === 0) {
-        echo json_encode(['status' => 'error', 'message' => 'Service not found.']);
+
+        echo json_encode([
+            'status'  => 'error',
+            'message' => 'Service not found.',
+        ]);
+
         exit;
     }
 
-    echo json_encode(['status' => 'success', 'message' => 'Service deleted successfully.']);
+    echo json_encode([
+        'status'  => 'success',
+        'message' => 'Service deleted successfully.',
+    ]);
+
 } catch (PDOException $e) {
-    file_put_contents('error_log.txt', $e->getMessage() . PHP_EOL, FILE_APPEND);
+
+    file_put_contents(
+        'error_log.txt',
+        $e->getMessage() . PHP_EOL,
+        FILE_APPEND
+    );
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Failed to delete the service.',
     ]);
+
 } finally {
+
     $pdo = null;
 }

@@ -1,4 +1,5 @@
 <?php
+
 require_once 'session_config.php';
 
 $allowed_origins = [
@@ -11,8 +12,14 @@ if (in_array($origin, $allowed_origins, true)) {
     header("Access-Control-Allow-Origin: $origin");
 } else {
     http_response_code(403);
+
     header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'Origin not allowed.']);
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Origin not allowed.',
+    ]);
+
     exit;
 }
 
@@ -27,29 +34,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 if (! isset($_SESSION['id'])) {
     http_response_code(401);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Unauthorized access. Please log in.',
     ]);
+
     exit;
 }
 
 $user_role = $_SESSION['role'] ?? 'customer';
+
 if (strtolower($user_role) !== 'admin') {
     http_response_code(403);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Forbidden: Admin permissions required.',
     ]);
+
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Invalid request method.',
     ]);
+
+    exit;
+}
+
+$config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+
+if ($config === false) {
+    error_log('admin_shop_orders.php: Failed to parse .env file');
+
+    http_response_code(500);
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
+    ]);
+
+    exit;
+}
+
+$dbHost     = $config['DB_HOST'] ?? '';
+$dbName     = $config['DB_NAME'] ?? '';
+$dbUser     = $config['DB_USER'] ?? '';
+$dbPassword = $config['DB_PASSWORD'] ?? '';
+
+if (
+    $dbHost === '' ||
+    $dbName === '' ||
+    $dbUser === ''
+) {
+    error_log('admin_shop_orders.php: Database settings are missing from .env');
+
+    http_response_code(500);
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
+    ]);
+
     exit;
 }
 
@@ -58,9 +109,9 @@ $pdo = null;
 try {
 
     $pdo = new PDO(
-        'mysql:host=localhost;dbname=rasa_hair_studio',
-        'root',
-        '',
+        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
+        $dbUser,
+        $dbPassword,
         [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -95,16 +146,22 @@ try {
             ti.unit_amount,
             ti.total_amount
          FROM transactions t
-         LEFT JOIN transaction_items ti ON ti.transaction_id = t.id
-         ORDER BY t.created_at DESC, t.id DESC, ti.id ASC'
+         LEFT JOIN transaction_items ti
+             ON ti.transaction_id = t.id
+         ORDER BY
+             t.created_at DESC,
+             t.id DESC,
+             ti.id ASC'
     );
 
     $orders_by_id = [];
 
     while ($row = $stmt->fetch()) {
+
         $transaction_id = (int) $row['transaction_id'];
 
         if (! isset($orders_by_id[$transaction_id])) {
+
             $orders_by_id[$transaction_id] = [
                 'id'                           => $transaction_id,
                 'user_id'                      => $row['user_id'] === null ? null : (int) $row['user_id'],
@@ -129,9 +186,12 @@ try {
         }
 
         if ($row['item_id'] !== null) {
+
             $orders_by_id[$transaction_id]['items'][] = [
                 'id'           => (int) $row['item_id'],
-                'product_id'   => $row['product_id'] === null ? null : (int) $row['product_id'],
+                'product_id'   => $row['product_id'] === null
+                    ? null
+                    : (int) $row['product_id'],
                 'product_name' => $row['product_name'],
                 'quantity'     => (int) $row['quantity'],
                 'unit_amount'  => (int) $row['unit_amount'],
@@ -144,13 +204,22 @@ try {
         'status' => 'success',
         'orders' => array_values($orders_by_id),
     ]);
+
 } catch (Throwable $e) {
-    error_log('admin_shop_orders.php: ' . $e->getMessage());
+
+    error_log(
+        'admin_shop_orders.php: ' .
+        $e->getMessage()
+    );
+
     http_response_code(500);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Shop orders could not be loaded.',
     ]);
+
 } finally {
+
     $pdo = null;
 }

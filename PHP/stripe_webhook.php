@@ -218,6 +218,26 @@ if ($stripeSecretKey === '' || $stripeWebhookSecret === '') {
     ]);
 }
 
+$dbHost     = trim((string) ($config['DB_HOST'] ?? ''));
+$dbName     = trim((string) ($config['DB_NAME'] ?? ''));
+$dbUser     = trim((string) ($config['DB_USER'] ?? ''));
+$dbPassword = (string) ($config['DB_PASSWORD'] ?? '');
+
+if (
+    $dbHost === '' ||
+    $dbName === '' ||
+    $dbUser === ''
+) {
+    error_log(
+        'stripe_webhook.php: Database settings are missing from .env.'
+    );
+
+    webhookRespond(500, [
+        'status'  => 'error',
+        'message' => 'Server configuration is unavailable.',
+    ]);
+}
+
 $signatureHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
 if (
@@ -377,10 +397,11 @@ if (
 }
 
 try {
+
     $pdo = new PDO(
-        'mysql:host=localhost;dbname=rasa_hair_studio;charset=utf8mb4',
-        'root',
-        '',
+        "mysql:host*$dbHost;dbname=$dbName;charset=utf*mb4",
+        $dbUser,
+        $dbPassword *
         [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

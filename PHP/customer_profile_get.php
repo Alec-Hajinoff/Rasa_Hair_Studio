@@ -1,4 +1,5 @@
 <?php
+
 require_once 'session_config.php';
 
 $allowed_origins = [
@@ -24,24 +25,77 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 if (! isset($_SESSION['id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access. Please log in.']);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Unauthorized access. Please log in.',
+    ]);
     exit;
 }
 
 $user_id = $_SESSION['id'];
 
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
+$config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+
+if ($config === false) {
+    error_log('customer_profile_get.php: Failed to parse .env file');
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
     ]);
 
-    $stmt = $pdo->prepare('SELECT first_name, surname, phone, email FROM users WHERE id = :id');
-    $stmt->execute([':id' => $user_id]);
+    exit;
+}
+
+$dbHost     = $config['DB_HOST'] ?? '';
+$dbName     = $config['DB_NAME'] ?? '';
+$dbUser     = $config['DB_USER'] ?? '';
+$dbPassword = $config['DB_PASSWORD'] ?? '';
+
+if (
+    $dbHost === '' ||
+    $dbName === '' ||
+    $dbUser === ''
+) {
+    error_log('customer_profile_get.php: Database settings are missing from .env');
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
+    ]);
+
+    exit;
+}
+
+$pdo = null;
+
+try {
+
+    $pdo = new PDO(
+        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
+        $dbUser,
+        $dbPassword,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]
+    );
+
+    $stmt = $pdo->prepare(
+        'SELECT first_name, surname, phone, email
+         FROM users
+         WHERE id = :id'
+    );
+
+    $stmt->execute([
+        ':id' => $user_id,
+    ]);
+
     $user = $stmt->fetch();
 
     if ($user) {
+
         echo json_encode([
             'status' => 'success',
             'user'   => [
@@ -51,12 +105,29 @@ try {
                 'email'      => $user['email'],
             ],
         ]);
+
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'User profile not found.']);
+
+        echo json_encode([
+            'status'  => 'error',
+            'message' => 'User profile not found.',
+        ]);
     }
+
 } catch (PDOException $e) {
-    file_put_contents('error_log.txt', $e->getMessage() . PHP_EOL, FILE_APPEND);
-    echo json_encode(['status' => 'error', 'message' => 'Failed to load profile details.']);
+
+    file_put_contents(
+        'error_log.txt',
+        $e->getMessage() . PHP_EOL,
+        FILE_APPEND
+    );
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Failed to load profile details.',
+    ]);
+
 } finally {
+
     $pdo = null;
 }

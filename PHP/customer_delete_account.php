@@ -1,4 +1,5 @@
 <?php
+
 require_once 'session_config.php';
 
 $allowed_origins = [
@@ -24,36 +25,100 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 if (! isset($_SESSION['id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access. Please log in.']);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Unauthorized access. Please log in.',
+    ]);
     exit;
 }
 
 $user_id = $_SESSION['id'];
 
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=rasa_hair_studio', 'root', '', [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
+$config = parse_ini_file(__DIR__ . '/../.env', false, INI_SCANNER_RAW);
+
+if ($config === false) {
+    error_log('customer_delete_account.php: Failed to parse .env file');
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
     ]);
+
+    exit;
+}
+
+$dbHost     = $config['DB_HOST'] ?? '';
+$dbName     = $config['DB_NAME'] ?? '';
+$dbUser     = $config['DB_USER'] ?? '';
+$dbPassword = $config['DB_PASSWORD'] ?? '';
+
+if (
+    $dbHost === '' ||
+    $dbName === '' ||
+    $dbUser === ''
+) {
+    error_log('customer_delete_account.php: Database settings are missing from .env');
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration error.',
+    ]);
+
+    exit;
+}
+
+$pdo = null;
+
+try {
+
+    $pdo = new PDO(
+        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
+        $dbUser,
+        $dbPassword,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]
+    );
 
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare('SELECT id FROM users WHERE id = :id AND is_deleted = 0');
-    $stmt->execute([':id' => $user_id]);
+    $stmt = $pdo->prepare(
+        'SELECT id
+         FROM users
+         WHERE id = :id
+         AND is_deleted = 0'
+    );
+
+    $stmt->execute([
+        ':id' => $user_id,
+    ]);
+
     $user = $stmt->fetch();
 
     if (! $user) {
+
         $pdo->rollBack();
-        echo json_encode(['status' => 'error', 'message' => 'Account not found or already deleted.']);
+
+        echo json_encode([
+            'status'  => 'error',
+            'message' => 'Account not found or already deleted.',
+        ]);
+
         exit;
     }
 
-    $randomPasswordHash = password_hash(bin2hex(random_bytes(32)), PASSWORD_BCRYPT);
+    $randomPasswordHash = password_hash(
+        bin2hex(random_bytes(32)),
+        PASSWORD_BCRYPT
+    );
 
-    $anonymiseStmt = $pdo->prepare('
+    $anonymiseStmt = $pdo->prepare(
+        '
         UPDATE users
-        SET is_deleted = 1,
+        SET
+            is_deleted = 1,
             first_name = NULL,
             surname = NULL,
             phone = NULL,
@@ -65,7 +130,8 @@ try {
             password_token_expires_at = NULL,
             updated_at = NOW()
         WHERE id = :id
-    ');
+        '
+    );
 
     $anonymiseStmt->execute([
         ':password' => $randomPasswordHash,
@@ -75,8 +141,11 @@ try {
     $pdo->commit();
 
     $_SESSION = [];
+
     if (ini_get('session.use_cookies')) {
+
         $params = session_get_cookie_params();
+
         setcookie(
             session_name(),
             '',
@@ -87,6 +156,7 @@ try {
             $params['httponly']
         );
     }
+
     session_destroy();
 
     echo json_encode([
@@ -95,11 +165,23 @@ try {
     ]);
 
 } catch (PDOException $e) {
+
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    file_put_contents('error_log.txt', $e->getMessage() . PHP_EOL, FILE_APPEND);
-    echo json_encode(['status' => 'error', 'message' => 'Failed to delete account.']);
+
+    file_put_contents(
+        'error_log.txt',
+        $e->getMessage() . PHP_EOL,
+        FILE_APPEND
+    );
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Failed to delete account.',
+    ]);
+
 } finally {
+
     $pdo = null;
 }

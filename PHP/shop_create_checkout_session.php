@@ -8,11 +8,14 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 if (! in_array($origin, $allowed_origins, true)) {
     http_response_code(403);
+
     header('Content-Type: application/json');
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Origin not allowed.',
     ]);
+
     exit;
 }
 
@@ -29,10 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Invalid request method.',
     ]);
+
     exit;
 }
 
@@ -42,72 +47,107 @@ $checkoutUserId = isset($_SESSION['id'])
     ? (string) $_SESSION['id']
     : null;
 
-$envPath = __DIR__ . '/../.env';
+$config = parse_ini_file(
+    __DIR__ . '/../.env',
+    false,
+    INI_SCANNER_RAW
+);
 
-if (! is_file($envPath) || ! is_readable($envPath)) {
-    error_log('shop_create_checkout_session.php: Project .env file is missing or unreadable.');
+if ($config === false) {
+    error_log(
+        'shop_create_checkout_session.php: Failed to parse .env file.'
+    );
+
     http_response_code(500);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Server configuration is unavailable.',
     ]);
+
     exit;
 }
 
-$envLines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$stripeSecretKey = $config['STRIPE_SECRET_KEY'] ?? '';
 
-foreach ($envLines as $line) {
-    $line = trim($line);
-
-    if ($line === '' || str_starts_with($line, '#') || ! str_contains($line, '=')) {
-        continue;
-    }
-
-    [$name, $value] = explode('=', $line, 2);
-    $name           = trim($name);
-    $value          = trim($value, " \t\n\r\0\x0B\"'");
-
-    $_ENV[$name] = $value;
-    putenv($name . '=' . $value);
-}
-
-$stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'] ?? getenv('STRIPE_SECRET_KEY') ?: '';
-$ngrokDomain     = rtrim(
-    $_ENV['NGROK_DOMAIN'] ?? getenv('NGROK_DOMAIN') ?: '',
-    '/',
+$ngrokDomain = rtrim(
+    $config['NGROK_DOMAIN'] ?? '',
+    '/'
 );
 
+$deliveryChargeGbp = trim(
+    (string) ($config['DELIVERY_CHARGE_GBP'] ?? '')
+);
+
+$dbHost     = $config['DB_HOST'] ?? '';
+$dbName     = $config['DB_NAME'] ?? '';
+$dbUser     = $config['DB_USER'] ?? '';
+$dbPassword = $config['DB_PASSWORD'] ?? '';
+
 if ($stripeSecretKey === '') {
-    error_log('shop_create_checkout_session.php: STRIPE_SECRET_KEY is not configured.');
+
+    error_log(
+        'shop_create_checkout_session.php: STRIPE_SECRET_KEY is not configured.'
+    );
+
     http_response_code(500);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Stripe is not configured on the server.',
     ]);
+
     exit;
 }
 
 if (! filter_var($ngrokDomain, FILTER_VALIDATE_URL)) {
-    error_log('shop_create_checkout_session.php: NGROK_DOMAIN is missing or invalid.');
+
+    error_log(
+        'shop_create_checkout_session.php: NGROK_DOMAIN is missing or invalid.'
+    );
+
     http_response_code(500);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'The checkout return URL is not configured on the server.',
     ]);
+
     exit;
 }
 
-$deliveryChargeGbp = trim(
-    (string) ($_ENV['DELIVERY_CHARGE_GBP'] ?? getenv('DELIVERY_CHARGE_GBP') ?: '')
-);
+if (
+    $dbHost === '' ||
+    $dbName === '' ||
+    $dbUser === ''
+) {
+    error_log(
+        'shop_create_checkout_session.php: Database settings are missing from .env.'
+    );
+
+    http_response_code(500);
+
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Server configuration is unavailable.',
+    ]);
+
+    exit;
+}
 
 if (! preg_match('/^\d+(?:\.\d{1,2})?$/', $deliveryChargeGbp)) {
-    error_log('shop_create_checkout_session.php: DELIVERY_CHARGE_GBP is missing or invalid.');
+
+    error_log(
+        'shop_create_checkout_session.php: DELIVERY_CHARGE_GBP is missing or invalid.'
+    );
+
     http_response_code(500);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Delivery charge configuration is invalid.',
     ]);
+
     exit;
 }
 
@@ -117,40 +157,60 @@ $deliveryPenceText = str_pad($deliveryParts[1] ?? '', 2, '0');
 $deliveryPence     = (int) substr($deliveryPenceText, 0, 2);
 
 if ($deliveryPounds > intdiv(PHP_INT_MAX - 99, 100)) {
-    error_log('shop_create_checkout_session.php: DELIVERY_CHARGE_GBP is too large.');
+
+    error_log(
+        'shop_create_checkout_session.php: DELIVERY_CHARGE_GBP is too large.'
+    );
+
     http_response_code(500);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Delivery charge configuration is invalid.',
     ]);
+
     exit;
 }
 
-$deliveryChargePence = ($deliveryPounds * 100) + $deliveryPence;
+$deliveryChargePence =
+    ($deliveryPounds * 100) + $deliveryPence;
 
-$input = json_decode(file_get_contents('php://input'), true);
+$input = json_decode(
+    file_get_contents('php://input'),
+    true
+);
 
 if (! is_array($input)) {
+
     http_response_code(400);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Invalid checkout request.',
     ]);
+
     exit;
 }
 
-$requestedItems               = $input['items'] ?? null;
-$requestedDeliveryChargePence = $input['delivery_charge_pence'] ?? null;
+$requestedItems = $input['items'] ?? null;
+
+$requestedDeliveryChargePence =
+$input['delivery_charge_pence'] ?? null;
 
 if (
-    filter_var($requestedDeliveryChargePence, FILTER_VALIDATE_INT) === false ||
+    filter_var(
+        $requestedDeliveryChargePence,
+        FILTER_VALIDATE_INT
+    ) === false ||
     (int) $requestedDeliveryChargePence !== $deliveryChargePence
 ) {
     http_response_code(409);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'The delivery charge has changed. Please reload your basket and try again.',
     ]);
+
     exit;
 }
 
@@ -160,16 +220,19 @@ if (
     count($requestedItems) > 100
 ) {
     http_response_code(400);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'The basket is empty or contains too many items.',
     ]);
+
     exit;
 }
 
 $quantitiesByProductId = [];
 
 foreach ($requestedItems as $item) {
+
     $rawId       = $item['id'] ?? null;
     $rawQuantity = $item['quantity'] ?? null;
 
@@ -181,32 +244,39 @@ foreach ($requestedItems as $item) {
         (int) $rawQuantity > 99
     ) {
         http_response_code(400);
+
         echo json_encode([
             'status'  => 'error',
             'message' => 'The basket contains an invalid product or quantity.',
         ]);
+
         exit;
     }
 
     $productId = (int) $rawId;
 
     if (isset($quantitiesByProductId[$productId])) {
+
         http_response_code(400);
+
         echo json_encode([
             'status'  => 'error',
             'message' => 'The basket contains a duplicate product.',
         ]);
+
         exit;
     }
 
-    $quantitiesByProductId[$productId] = (int) $rawQuantity;
+    $quantitiesByProductId[$productId] =
+    (int) $rawQuantity;
 }
 
 try {
+
     $pdo = new PDO(
-        'mysql:host=localhost;dbname=rasa_hair_studio',
-        'root',
-        '',
+        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
+        $dbUser,
+        $dbPassword,
         [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -214,35 +284,50 @@ try {
         ]
     );
 
-    $productIds   = array_keys($quantitiesByProductId);
-    $placeholders = implode(',', array_fill(0, count($productIds), '?'));
+    $productIds = array_keys($quantitiesByProductId);
+
+    $placeholders = implode(
+        ',',
+        array_fill(0, count($productIds), '?')
+    );
 
     $stmt = $pdo->prepare(
         "SELECT id, name, price_gbp
          FROM products
-         WHERE is_active = 1 AND id IN ($placeholders)"
+         WHERE is_active = 1
+         AND id IN ($placeholders)"
     );
+
     $stmt->execute($productIds);
+
     $products = $stmt->fetchAll();
 
     if (count($products) !== count($productIds)) {
+
         http_response_code(400);
+
         echo json_encode([
             'status'  => 'error',
             'message' => 'One or more basket products are unavailable.',
         ]);
+
         exit;
     }
 
     $lineItems = [];
 
     foreach ($products as $product) {
+
         $productId    = (int) $product['id'];
         $quantity     = $quantitiesByProductId[$productId];
-        $priceInPence = (int) round(((float) $product['price_gbp']) * 100);
+        $priceInPence = (int) round(
+            ((float) $product['price_gbp']) * 100
+        );
 
         if ($priceInPence < 1) {
-            throw new RuntimeException('A product has an invalid price.');
+            throw new RuntimeException(
+                'A product has an invalid price.'
+            );
         }
 
         $lineItems[] = [
@@ -271,7 +356,6 @@ try {
         'shipping_address_collection' => [
             'allowed_countries' => ['GB'],
         ],
-
         'shipping_options'            => [[
             'shipping_rate_data' => [
                 'type'         => 'fixed_amount',
@@ -282,7 +366,6 @@ try {
                 ],
             ],
         ]],
-
         'line_items'                  => $lineItems,
     ];
 
@@ -292,7 +375,10 @@ try {
         ];
     }
 
-    $curl = curl_init('https://api.stripe.com/v1/checkout/sessions');
+    $curl = curl_init(
+        'https://api.stripe.com/v1/checkout/sessions'
+    );
+
     curl_setopt_array($curl, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST           => true,
@@ -307,20 +393,34 @@ try {
 
     $stripeResponse = curl_exec($curl);
     $curlError      = curl_error($curl);
-    $stripeHttpCode = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $stripeHttpCode = (int) curl_getinfo(
+        $curl,
+        CURLINFO_HTTP_CODE
+    );
+
     curl_close($curl);
 
     if ($stripeResponse === false) {
-        error_log('shop_create_checkout_session.php: Stripe request failed: ' . $curlError);
+
+        error_log(
+            'shop_create_checkout_session.php: Stripe request failed: ' .
+            $curlError
+        );
+
         http_response_code(502);
+
         echo json_encode([
             'status'  => 'error',
             'message' => 'Could not connect to the payment provider.',
         ]);
+
         exit;
     }
 
-    $stripeData = json_decode($stripeResponse, true);
+    $stripeData = json_decode(
+        $stripeResponse,
+        true
+    );
 
     if (
         $stripeHttpCode < 200 ||
@@ -331,13 +431,15 @@ try {
             'shop_create_checkout_session.php: Stripe API error: ' .
             ($stripeData['error']['message'] ?? 'Unknown Stripe error.')
         );
+
         http_response_code(502);
+
         echo json_encode([
             'status'  => 'error',
             'message' =>
-            $stripeData['error']['message'] ??
-            'Stripe could not start checkout.',
+            $stripeData['error']['message'] ?? 'Stripe could not start checkout.',
         ]);
+
         exit;
     }
 
@@ -346,9 +448,16 @@ try {
         'url'        => $stripeData['url'],
         'session_id' => $stripeData['id'],
     ]);
+
 } catch (Throwable $e) {
-    error_log('shop_create_checkout_session.php: ' . $e->getMessage());
+
+    error_log(
+        'shop_create_checkout_session.php: ' .
+        $e->getMessage()
+    );
+
     http_response_code(500);
+
     echo json_encode([
         'status'  => 'error',
         'message' => 'Checkout could not be started.',
