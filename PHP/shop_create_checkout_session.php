@@ -2,31 +2,29 @@
 
 $allowed_origins = [
     'http://localhost:5173',
+    'https://rasalstudio.com',
+    'https://www.rasalstudio.com',
 ];
 
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 
-if (! in_array($origin, $allowed_origins, true)) {
-    http_response_code(403);
+if ($origin !== null && in_array($origin, $allowed_origins, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+} elseif ($origin === null) {
 
-    header('Content-Type: application/json');
+    // Allow same-origin and direct requests.
 
-    echo json_encode([
-        'status'  => 'error',
-        'message' => 'Origin not allowed.',
-    ]);
-
+} else {
+    header('HTTP/1.1 403 Forbidden');
     exit;
 }
 
-header("Access-Control-Allow-Origin: $origin");
 header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Content-Type: application/json; charset=UTF-8');
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
     exit;
 }
 
