@@ -51,7 +51,7 @@ if (isset($input['email'], $input['password'])) {
     }
     $password = $input['password'];
     try {
-        $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName",
+        $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
             $dbUser,
             $dbPassword, [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
